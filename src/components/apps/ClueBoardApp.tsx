@@ -314,7 +314,9 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
                             ) : (
                               <HelpCircle className="w-3.5 h-3.5 text-[#A99A8C] shrink-0" />
                             )}
-                            <span className="truncate">{clue.title}</span>
+                            <span className="truncate">
+                              {unlocked ? clue.title : '线索未找到'}
+                            </span>
                             {!unlocked ? (
                               <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-[#E9E1D6] text-[#8B7A6B] shrink-0">
                                 未取得
@@ -328,13 +330,11 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
                             <span className="text-[10px] text-[#6E5A52]">{clue.sourceApp}</span>
                           </span>
                         </div>
-                        <p
-                          className={`text-[11px] leading-snug ${
-                            unlocked ? 'text-[#4A3A32]' : 'text-[#8B7A6B] italic'
-                          }`}
-                        >
-                          {unlocked ? clue.summary : '线索未找到'}
-                        </p>
+                        {unlocked ? (
+                          <p className="text-[11px] text-[#4A3A32] leading-snug">
+                            {clue.summary}
+                          </p>
+                        ) : null}
                         {unlocked && clue.derivedFrom ? (
                           <p className="text-[10px] text-[#B45309] mt-1 font-bold">
                             ※ 由两条线索拼合而来
