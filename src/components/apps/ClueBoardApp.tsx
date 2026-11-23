@@ -3,7 +3,6 @@ import {
   CheckCircle2,
   Combine,
   FolderOpen,
-  HelpCircle,
   Lock,
   RotateCcw,
   Send,
@@ -310,25 +309,22 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
                         <div className="flex items-center justify-between gap-2 mb-0.5">
                           <span className="text-xs font-black text-[#3A2D28] flex items-center gap-1.5 min-w-0">
                             {unlocked ? (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
+                              <>
+                                <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
+                                <span className="truncate">{clue.title}</span>
+                              </>
                             ) : (
-                              <HelpCircle className="w-3.5 h-3.5 text-[#A99A8C] shrink-0" />
+                              <span className="truncate">线索未找到</span>
                             )}
-                            <span className="truncate">
-                              {unlocked ? clue.title : '线索未找到'}
-                            </span>
-                            {!unlocked ? (
-                              <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-[#E9E1D6] text-[#8B7A6B] shrink-0">
-                                未取得
+                          </span>
+                          {unlocked ? (
+                            <span className="flex items-center gap-1 shrink-0">
+                              <span className="text-[9px] px-1 py-0.5 rounded border bg-[#FFFDF7]/80 border-[#3A2D28] text-[#3A2D28]">
+                                {TIER_LABEL[clue.tier]}
                               </span>
-                            ) : null}
-                          </span>
-                          <span className="flex items-center gap-1 shrink-0">
-                            <span className="text-[9px] px-1 py-0.5 rounded border bg-[#FFFDF7]/80 border-[#3A2D28] text-[#3A2D28]">
-                              {TIER_LABEL[clue.tier]}
+                              <span className="text-[10px] text-[#6E5A52]">{clue.sourceApp}</span>
                             </span>
-                            <span className="text-[10px] text-[#6E5A52]">{clue.sourceApp}</span>
-                          </span>
+                          ) : null}
                         </div>
                         {unlocked ? (
                           <p className="text-[11px] text-[#4A3A32] leading-snug">

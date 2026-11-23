@@ -1097,6 +1097,8 @@ export default function App() {
           {win.appId === 'pet' ? (
             <CatPetApp
               chapter={contentChapter}
+              clues={INITIAL_CLUES}
+              caseState={caseState}
               discoveredClues={discoveredClues}
               onDiscoverClue={discoverClue}
               onFlag={handleFlag}

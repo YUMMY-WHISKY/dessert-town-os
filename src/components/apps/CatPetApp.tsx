@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Heart, Fish, Sparkles } from 'lucide-react';
 import { soundEngine } from '../../os/sound';
+import { buildHintPlan } from '../../os/hints';
+import { CaseState, ClueItem } from '../../os/types';
 
 interface CatPetAppProps {
   chapter: number;
+  clues: ClueItem[];
+  caseState: CaseState;
   discoveredClues: string[];
   onDiscoverClue: (clueId: string) => void;
   onFlag: (flag: string) => void;
@@ -73,6 +77,8 @@ const WHISPERS: Whisper[] = [
 
 export const CatPetApp: React.FC<CatPetAppProps> = ({
   chapter,
+  clues,
+  caseState,
   discoveredClues,
   onDiscoverClue,
   onFlag,
@@ -82,37 +88,34 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
   const [feedCount, setFeedCount] = useState(0);
   const [lineIndex, setLineIndex] = useState(0);
   const [petted, setPetted] = useState(false);
-  const [hintMode, setHintMode] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
+
+  const hintPlan = useMemo(
+    () => buildHintPlan(chapter, clues, discoveredClues, caseState),
+    [chapter, clues, discoveredClues, caseState]
+  );
+
+  // 换章后重新从第一级提示开始
+  useEffect(() => {
+    setHintLevel(0);
+  }, [chapter]);
 
   const eligible = WHISPERS.filter(
     (w) => w.chapter <= chapter && (w.needFeed ?? 0) <= feedCount
   );
   const current = eligible.length > 0 ? eligible[lineIndex % eligible.length] : null;
 
-  const hintText = (() => {
-    const has = (id: string) => discoveredClues.includes(id);
-    if (chapter === 2 && !has('clue_milu_slip'))
-      return '喵。把证词卡摆到时间线白板上，看看哪两段时间打架；或者直接问米露烤箱定时的事。';
-    if (chapter === 3 && (!has('clue_store_fund') || !has('clue_rejection_receipt') || !has('clue_fund_motive')))
-      return '喵呜。八音盒的最后一首会给你四个数字，店庆基金就锁在里面；再看看波比账户里镇议会发来的回执。两份放在一起，选「因果动机」。';
-    if (chapter === 4 && (!has('clue_fire_contradiction') || !has('clue_kill_motive') || !has('clue_same_hand') || !has('clue_relations_solved')))
-      return '呼噜。档案室四个年份都调一遍；把 2006 年的验收单和火灾报告放在一起选「互相冲突」；手续链和关系板也别忘了。';
-    if (chapter === 5)
-      return '喵。第五章没有新谜题。看完真相，在下面选一个你要交上去的版本。';
-    return '喵。这一章的门已经开了。去破案手账看看，还剩哪条线索是灰的。';
-  })();
-
   const whisper = petted
     ? '呼噜噜……（煤球舒服得眯起了眼睛，尾巴一圈一圈地绕）'
-    : hintMode
-      ? hintText
+    : hintLevel > 0
+      ? hintPlan.levels[hintLevel - 1]
       : current?.text ?? '喵？';
 
   const handleFeed = () => {
     soundEngine.playClick();
     onFeed();
     setPetted(false);
-    setHintMode(false);
+    setHintLevel(0);
     setFeedCount((c) => c + 1);
     setMood('happy');
     setLineIndex((i) => i + 1);
@@ -129,14 +132,19 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
     soundEngine.playTone(880, 0.1, 'sine', 0.05);
     setMood('curious');
     setPetted(true);
-    setHintMode(false);
+    setHintLevel(0);
   };
 
   const handleHint = () => {
     soundEngine.playTone(660, 0.12, 'sine', 0.05);
     onFlag('used_hint');
     setPetted(false);
-    setHintMode(true);
+    setHintLevel((level) => Math.min(3, level + 1));
+  };
+
+  const handleCloseHint = () => {
+    soundEngine.playClick();
+    setHintLevel(0);
   };
 
   const handleRecord = () => {
@@ -167,7 +175,16 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
         “{whisper}”
       </div>
 
-      {current?.clueId ? (
+      {hintLevel > 0 ? (
+        <div className="flex items-center justify-center gap-2 mb-3 text-[10px] font-black text-[#6E5A52]">
+          <span className="px-2 py-0.5 rounded-full bg-[#DBEAFE] border border-[#3A2D28]">
+            提示 {hintLevel}/3
+          </span>
+          <span>{hintLevel < 3 ? '还可以再具体一点' : '这次说得够清楚了'}</span>
+        </div>
+      ) : null}
+
+      {hintLevel === 0 && current?.clueId ? (
         <button
           type="button"
           onClick={handleRecord}
@@ -177,7 +194,7 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
         </button>
       ) : null}
 
-      <div className="flex items-center justify-center gap-2.5">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="button"
           onClick={handleFeed}
@@ -197,10 +214,24 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
         <button
           type="button"
           onClick={handleHint}
-          className="cartoon-btn px-3.5 py-2 rounded-xl bg-[#DBEAFE] text-[11px] font-black text-[#3A2D28]"
+          disabled={hintLevel >= 3}
+          className="cartoon-btn px-3.5 py-2 rounded-xl bg-[#DBEAFE] text-[11px] font-black text-[#3A2D28] disabled:opacity-50"
         >
-          卡住了？问问煤球
+          {hintLevel === 0
+            ? '卡住了？问问煤球'
+            : hintLevel < 3
+              ? '再提示一点'
+              : '去试试吧'}
         </button>
+        {hintLevel > 0 ? (
+          <button
+            type="button"
+            onClick={handleCloseHint}
+            className="cartoon-btn px-3.5 py-2 rounded-xl bg-[#FFFDF7] text-[11px] font-black text-[#3A2D28]"
+          >
+            收起
+          </button>
+        ) : null}
       </div>
     </div>
   );
