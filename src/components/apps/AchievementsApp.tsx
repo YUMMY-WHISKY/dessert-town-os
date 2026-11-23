@@ -1,12 +1,11 @@
 import React from 'react';
-import { CheckCircle2, Lock, Sparkles, Trophy } from 'lucide-react';
+import { CheckCircle2, Lock, Trophy } from 'lucide-react';
 import {
   ACHIEVEMENT_CATEGORY_LABEL,
   ACHIEVEMENTS,
   AchievementCategory,
   AchievementDef,
   AchievementProgress,
-  HIDDEN_ACHIEVEMENTS,
   VISIBLE_ACHIEVEMENTS,
 } from '../../os/achievements';
 
@@ -56,9 +55,11 @@ const AchievementCard: React.FC<{
       >
         {def.name}
       </p>
-      <p className="text-[10px] font-bold text-[#8B7A6B] leading-snug mt-0.5">
-        {def.description}
-      </p>
+      {unlocked ? (
+        <p className="text-[10px] font-bold text-[#8B7A6B] leading-snug mt-0.5">
+          {def.description}
+        </p>
+      ) : null}
     </div>
     {unlocked ? (
       <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0 ml-auto" />
@@ -68,7 +69,6 @@ const AchievementCard: React.FC<{
 
 export const AchievementsApp: React.FC<AchievementsAppProps> = ({ progress }) => {
   const unlocked = new Set(progress.unlocked);
-  const hiddenUnlocked = HIDDEN_ACHIEVEMENTS.filter((a) => unlocked.has(a.id)).length;
   const allUnlocked = ACHIEVEMENTS.filter((a) => unlocked.has(a.id)).length;
   const ratio = Math.round((allUnlocked / ACHIEVEMENTS.length) * 100);
 
@@ -113,21 +113,6 @@ export const AchievementsApp: React.FC<AchievementsAppProps> = ({ progress }) =>
             </section>
           );
         })}
-
-        <section>
-          <h3 className="text-[11px] font-black text-[#3A2D28] mb-1.5 flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#DC2626]" />
-            <span>{ACHIEVEMENT_CATEGORY_LABEL.hidden}</span>
-            <span className="tabular-nums text-[10px] px-1.5 py-0.5 rounded border border-[#D8CBB8] bg-[#FFFDF7] text-[#6E5A52]">
-              {hiddenUnlocked}/{HIDDEN_ACHIEVEMENTS.length}
-            </span>
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-            {HIDDEN_ACHIEVEMENTS.map((def) => (
-              <AchievementCard key={def.id} def={def} unlocked={unlocked.has(def.id)} />
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   );
