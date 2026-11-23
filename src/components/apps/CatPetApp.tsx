@@ -9,70 +9,24 @@ interface CatPetAppProps {
   clues: ClueItem[];
   caseState: CaseState;
   discoveredClues: string[];
-  onDiscoverClue: (clueId: string) => void;
   onFlag: (flag: string) => void;
   onFeed: () => void;
 }
 
-interface Whisper {
-  chapter: number;
-  needFeed?: number;
-  text: string;
-  clueId?: string;
-  flag?: string;
-}
-
-const WHISPERS: Whisper[] = [
-  {
-    chapter: 1,
-    text: '喵呜~ 前厅那摊黑糖浆是我踩的，地上那个爪印是我的，别冤枉我。',
-    clueId: 'clue_paw_print',
-    flag: 'cat_paw',
-  },
-  {
-    chapter: 1,
-    text: '隔壁那只黑猫下午来过。他问波比姐在不在，然后一直往柜台走，爪子抖得厉害。',
-    flag: 'cat_stranger',
-  },
-  {
-    chapter: 2,
-    text: '呼噜噜……那杯草莓牛奶是我尾巴扫翻的。但我不记得它什么时候倒的，我睡了一觉。',
-    flag: 'cat_milk',
-  },
-  {
-    chapter: 2,
-    needFeed: 3,
-    text: '喵！烤箱 14:20 就响了。米露姐姐以为还早，去了后门搬箱子，回来的时候已经 14:27 了。',
-    clueId: 'clue_milu_slip',
-    flag: 'cat_oven',
-  },
-  {
-    chapter: 3,
-    text: '探长，旧东西里有股旧报纸的味道。波比姐姐按人分成了三摞，不按时间。',
-    flag: 'cat_oldstuff',
-  },
-  {
-    chapter: 3,
-    needFeed: 5,
-    text: '她总在半夜翻那张 1998 年的开业照片。照片背面有她妈妈的字。',
-    flag: 'cat_photo',
-  },
-  {
-    chapter: 4,
-    text: '波比姐姐昨天抱着我坐了很久。她说「今晚十点之前，会有人来要一个答案」。',
-    flag: 'cat_poppy',
-  },
-  {
-    chapter: 4,
-    needFeed: 6,
-    text: '她把那叠旧档案摊在桌上，一份一份地数。五份都在，只差有人替她把它们摆成一条链。',
-    flag: 'cat_archive',
-  },
-  {
-    chapter: 5,
-    text: '喵……今晚十点，咕咕要你签结案稿。波比姐姐说，签不签，你自己判断。',
-    flag: 'cat_deadline',
-  },
+/** 煤球的日常闲聊，只关心人，不碰案件 */
+const WHISPERS: string[] = [
+  '喵呜~ 今天也要记得好好吃饭，别光盯着屏幕。',
+  '呼噜噜……你坐太久了，起来伸个懒腰吧。',
+  '喵。窗外风有点凉，出门记得加件外套。',
+  '我刚刚在窗台上晒了一会儿太阳，暖洋洋的。',
+  '小鱼干很好吃，不过你别只顾着喂我，自己也吃点。',
+  '喵呜，眼睛累了就看看远处，我陪你。',
+  '今天也辛苦了。剩下的明天再想也没关系。',
+  '呼噜……我睡一会儿，有事就叫我。',
+  '你回来啦。我一直在等你。',
+  '喵。先喝口水，再慢慢来。',
+  '尾巴摇一摇，坏心情就走开啦。',
+  '不管今天怎么样，晚上都要好好睡觉。',
 ];
 
 export const CatPetApp: React.FC<CatPetAppProps> = ({
@@ -80,7 +34,6 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
   clues,
   caseState,
   discoveredClues,
-  onDiscoverClue,
   onFlag,
   onFeed,
 }) => {
@@ -100,16 +53,11 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
     setHintLevel(0);
   }, [chapter]);
 
-  const eligible = WHISPERS.filter(
-    (w) => w.chapter <= chapter && (w.needFeed ?? 0) <= feedCount
-  );
-  const current = eligible.length > 0 ? eligible[lineIndex % eligible.length] : null;
-
   const whisper = petted
     ? '呼噜噜……（煤球舒服得眯起了眼睛，尾巴一圈一圈地绕）'
     : hintLevel > 0
       ? hintPlan.levels[hintLevel - 1]
-      : current?.text ?? '喵？';
+      : WHISPERS[lineIndex % WHISPERS.length];
 
   const handleFeed = () => {
     soundEngine.playClick();
@@ -118,14 +66,12 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
     setHintLevel(0);
     setFeedCount((c) => c + 1);
     setMood('happy');
-    setLineIndex((i) => i + 1);
-    const nextCount = feedCount + 1;
-    const nextEligible = WHISPERS.filter(
-      (w) => w.chapter <= chapter && (w.needFeed ?? 0) <= nextCount
-    );
-    const next = nextEligible[(lineIndex + 1) % Math.max(1, nextEligible.length)];
-    if (next?.clueId) onDiscoverClue(next.clueId);
-    if (next?.flag) onFlag(next.flag);
+    setLineIndex((prev) => {
+      if (WHISPERS.length <= 1) return 0;
+      let next = Math.floor(Math.random() * WHISPERS.length);
+      if (next === prev) next = (next + 1) % WHISPERS.length;
+      return next;
+    });
   };
 
   const handlePet = () => {
@@ -145,13 +91,6 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
   const handleCloseHint = () => {
     soundEngine.playClick();
     setHintLevel(0);
-  };
-
-  const handleRecord = () => {
-    if (!current?.clueId) return;
-    soundEngine.playClueFound();
-    onDiscoverClue(current.clueId);
-    if (current.flag) onFlag(current.flag);
   };
 
   return (
@@ -182,16 +121,6 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
           </span>
           <span>{hintLevel < 3 ? '还可以再具体一点' : '这次说得够清楚了'}</span>
         </div>
-      ) : null}
-
-      {hintLevel === 0 && current?.clueId ? (
-        <button
-          type="button"
-          onClick={handleRecord}
-          className="cartoon-btn px-3 py-1.5 rounded-xl bg-[#A7F3D0] text-[11px] font-black text-[#3A2D28] mb-3"
-        >
-          把这段话记进手账
-        </button>
       ) : null}
 
       <div className="flex flex-wrap items-center justify-center gap-2">

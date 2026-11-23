@@ -1100,7 +1100,6 @@ export default function App() {
               clues={INITIAL_CLUES}
               caseState={caseState}
               discoveredClues={discoveredClues}
-              onDiscoverClue={discoverClue}
               onFlag={handleFlag}
               onFeed={handleFeedPet}
             />
