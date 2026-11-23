@@ -296,13 +296,15 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
                       <button
                         key={clue.id}
                         type="button"
+                        disabled={!unlocked}
+                        title={unlocked ? undefined : '这条线索还没有找到'}
                         onClick={() => handleToggleClue(clue.id)}
-                        className={`text-left p-2.5 rounded-xl border-2 transition-all cursor-pointer ${
+                        className={`text-left p-2.5 rounded-xl border-2 transition-all ${
                           picked
-                            ? 'border-[#059669] bg-[#D1FAE5] shadow-[0_0_0_2px_#A7F3D0]'
+                            ? 'border-[#059669] bg-[#D1FAE5] shadow-[0_0_0_2px_#A7F3D0] cursor-pointer'
                             : unlocked
-                              ? `${TIER_BG[clue.tier]} border-[#3A2D28]`
-                              : 'bg-[#F6EFE2] border-[#D8CBB8] hover:border-[#3A2D28]'
+                              ? `${TIER_BG[clue.tier]} border-[#3A2D28] cursor-pointer`
+                              : 'bg-[#F6EFE2] border-[#D8CBB8] cursor-not-allowed'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2 mb-0.5">
@@ -326,8 +328,14 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
                             <span className="text-[10px] text-[#6E5A52]">{clue.sourceApp}</span>
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#4A3A32] leading-snug">{clue.summary}</p>
-                        {clue.derivedFrom ? (
+                        <p
+                          className={`text-[11px] leading-snug ${
+                            unlocked ? 'text-[#4A3A32]' : 'text-[#8B7A6B] italic'
+                          }`}
+                        >
+                          {unlocked ? clue.summary : '线索未找到'}
+                        </p>
+                        {unlocked && clue.derivedFrom ? (
                           <p className="text-[10px] text-[#B45309] mt-1 font-bold">
                             ※ 由两条线索拼合而来
                           </p>
