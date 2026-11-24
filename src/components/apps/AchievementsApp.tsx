@@ -53,9 +53,11 @@ const AchievementCard: React.FC<{
       >
         {def.name}
       </p>
-      <p className="text-[10px] font-bold text-[#8B7A6B] leading-snug mt-0.5">
-        {def.description}
-      </p>
+      {unlocked ? (
+        <p className="text-[10px] font-bold text-[#8B7A6B] leading-snug mt-0.5">
+          {def.description}
+        </p>
+      ) : null}
     </div>
     {unlocked ? (
       <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0 ml-auto" />
