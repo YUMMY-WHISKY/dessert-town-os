@@ -175,9 +175,15 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
               }`}
             >
               <span>第{ch.id}章</span>
-              <span className="tabular-nums text-[10px] px-1 rounded bg-[#FFFDF7]/70">
-                {stat?.found ?? 0}/{stat?.total ?? 0}
-              </span>
+              {ch.id === 5 ? (
+                <span className="text-[10px] font-black px-1 rounded bg-[#DC2626]/15 text-[#B91C1C]">
+                  指控
+                </span>
+              ) : (
+                <span className="tabular-nums text-[10px] px-1 rounded bg-[#FFFDF7]/70">
+                  {stat?.found ?? 0}/{stat?.total ?? 0}
+                </span>
+              )}
               {active && isReview ? (
                 <span className="text-[9px] font-bold opacity-70">回顾</span>
               ) : null}
