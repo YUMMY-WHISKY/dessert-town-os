@@ -135,7 +135,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'choice_ending_c',
     category: 'choice',
-    name: '签个字，皆大欢喜',
+    name: '这你也签？',
     description: '签下结案稿，用 C 结局收场',
   },
 
@@ -167,16 +167,16 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'hidden_perfect',
     category: 'choice',
-    name: '一点细节都不放过啊你',
-    description: '没用提示，找齐所有线索，用 A、B 两个结局结案，而且从没触发过 C 结局',
+    name: '金牌探长！！',
+    description: '用 A 或 B 结局结案',
   },
 
   // 七、细心发现
   {
     id: 'hidden_feed3',
     category: 'discovery',
-    name: '煤球投喂官',
-    description: '你投喂了煤球三次，它开始跟你说更多的话',
+    name: '爱猫人士',
+    description: '你投喂了煤球三次',
   },
 ];
 
@@ -256,7 +256,6 @@ export interface AchievementContext {
   discoveredClues: string[];
   chapterAnswers: Record<number, Record<string, string>>;
   ending: EndingId | null;
-  totalClues: number;
   progress: AchievementProgress;
 }
 
@@ -285,7 +284,7 @@ const CHAT_IDS = ['chat_milu', 'chat_achai', 'chat_black', 'chat_owl'];
 const BROWSER_VIEWS = ['forum', 'history', 'council'];
 
 function isMet(id: string, ctx: AchievementContext): boolean {
-  const { flags, discoveredClues, chapterAnswers, ending, totalClues, progress } = ctx;
+  const { flags, discoveredClues, chapterAnswers, ending, progress } = ctx;
   switch (id) {
     case 'story_ch1':
       return !!chapterAnswers[1];
@@ -337,13 +336,7 @@ function isMet(id: string, ctx: AchievementContext): boolean {
       return progress.endingsSeen.includes('C');
 
     case 'hidden_perfect':
-      return (
-        !flags.used_hint &&
-        discoveredClues.length >= totalClues &&
-        progress.endingsSeen.includes('A') &&
-        progress.endingsSeen.includes('B') &&
-        !progress.endingsSeen.includes('C')
-      );
+      return progress.endingsSeen.includes('A') || progress.endingsSeen.includes('B');
     case 'hidden_ch1_first_try':
       return !!progress.firstTry[1];
     case 'hidden_ch2_first_try':

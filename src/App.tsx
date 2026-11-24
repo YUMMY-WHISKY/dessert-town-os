@@ -228,7 +228,6 @@ export default function App() {
       discoveredClues,
       chapterAnswers: caseState.chapterAnswers,
       ending: caseState.ending,
-      totalClues: INITIAL_CLUES.length,
       progress: achievements,
     });
     if (newly.length === 0) return;
