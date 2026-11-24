@@ -17,8 +17,6 @@ interface TimelineAppProps {
 }
 
 const TOTAL_MIN = 60;
-/** 判定容差：±2 分钟；有 acceptRange 的卡片按区间判定 */
-const TOLERANCE = 2;
 
 function minuteLabel(min: number): string {
   const t = 14 * 60 + Math.round(min);
@@ -31,10 +29,12 @@ function clampMinute(guess: number): number {
   return Math.round(Math.min(TOTAL_MIN, Math.max(0, guess)));
 }
 
+/** 判定：点卡精确到分钟；区间卡按 start–end 覆盖 */
 function isCorrect(card: TimelineCard, minute: number, chapter: number): boolean {
   const range = card.acceptRange && card.acceptRange.chapter === chapter ? card.acceptRange : null;
   if (range) return minute >= range.from && minute <= range.to;
-  return Math.abs(minute - card.start) <= TOLERANCE;
+  if (card.kind === 'span') return minute >= card.start && minute <= card.end;
+  return minute === card.start;
 }
 
 export const TimelineApp: React.FC<TimelineAppProps> = ({

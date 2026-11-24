@@ -57,15 +57,15 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'd_who',
           prompt: '（她想了想）对了，他出来的时候，手上是空的。',
           choices: [
-            { label: '他待了多久？', reply: '不到四分钟吧，当时我正数着蛋挞的时间。', kind: 'case', next: 'd_who2' },
+            { label: '他待了多久？', reply: '不到三分钟吧，当时我正数着蛋挞的时间。', kind: 'case', next: 'd_who2' },
             { label: '你跟他说话了吗？', reply: '没有，他看都没看我。', kind: 'case', next: 'd_start' },
           ],
         },
         {
           id: 'd_who2',
-          prompt: '（她小声补充）四分钟，说长不长，说短也不短。',
+          prompt: '（她小声补充）三分钟，说长不长，说短也不短。',
           choices: [
-            { label: '四分钟能做什么？', reply: '我不知道。。', kind: 'case', next: 'd_start' },
+            { label: '三分钟能做什么？', reply: '我不知道。。', kind: 'case', next: 'd_start' },
             { label: '这件事你告诉过别人吗？', reply: '我谁都没说。波比姐让我别乱讲。', kind: 'case', next: 'd_start' },
           ],
         },
@@ -223,7 +223,7 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'b_visit',
           prompt: '（他别过脸）我 14:18 才到，前厅一个人都没有，喊了两声也没人应。',
           choices: [
-            { label: '你等了多久？', reply: '不到四分钟吧，她放我鸽子，我就走了。', kind: 'case', next: 'b_start' },
+            { label: '你等了多久？', reply: '不到三分钟吧，她放我鸽子，我就走了。', kind: 'case', next: 'b_start' },
             { label: '你走的时候，柜台有什么不对吗？', reply: '没注意，我当时一肚子火。', kind: 'case', next: 'b_start' },
             { label: '你空手出来的？', reply: '对。监控你们不是有吗？', kind: 'case', chapter: 4, next: 'b_start' },
           ],

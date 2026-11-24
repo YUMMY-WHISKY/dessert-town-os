@@ -327,8 +327,7 @@ export const TIMELINE_CARDS: TimelineCard[] = [
     end: 25,
     kind: 'point',
     text: '抽屉被打开，配方消失。',
-    chapter: 1,
-    acceptRange: { chapter: 1, from: 18, to: 21 },
+    chapter: 2,
   },
   {
     id: 'tl_set_timer',
