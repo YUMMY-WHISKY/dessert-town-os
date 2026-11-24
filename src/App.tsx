@@ -808,8 +808,13 @@ export default function App() {
   const visEmails = visibleEmails(emails, contentChapter);
   const visChats = visibleChats(chats, contentChapter);
   const archiveDrawers = ARCHIVE_DRAWERS;
-  const unreadMailCount = visEmails.filter((m) => !m.read).length;
-  const unreadChatCount = visChats.filter((t) => t.unread > 0).length;
+  // 桌面红点只统计侦探账户，切到波比/布莱克账户不影响桌面
+  const unreadMailCount = visEmails.filter(
+    (m) => (m.account ?? 'detective') === 'detective' && !m.read
+  ).length;
+  const unreadChatCount = visChats.filter(
+    (t) => (t.account ?? 'detective') === 'detective' && t.unread > 0
+  ).length;
 
   return (
     <CollectProvider
