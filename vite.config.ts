@@ -7,6 +7,10 @@ export default defineConfig(() => {
   return {
     // 相对路径：构建产物可直接部署到 GitHub Pages 的项目子路径
     base: './',
+    // 所有 < 5MB 的图片直接内联成 base64，绕开平台 iframe 里的路径解析问题
+    build: {
+      assetsInlineLimit: 5 * 1024 * 1024,
+    },
     plugins: [
       react(),
       tailwindcss(),
