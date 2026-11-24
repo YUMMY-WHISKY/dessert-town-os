@@ -720,30 +720,20 @@ export default function App() {
         setTimelinePlacements({});
       }
 
+      // 新章节出现的会话自动标未读，桌面聊天图标会亮红点
+      setChats((prev) =>
+        prev.map((t) =>
+          (t.chapter ?? 1) === nextChapter ? { ...t, unread: Math.max(t.unread, 1) } : t
+        )
+      );
+
       if (chapterId < 5) {
         const nextDef = CHAPTERS.find((c) => c.id === nextChapter);
-        const newMails = emails.filter((m) => (m.chapter ?? 1) === nextChapter).length;
-        const newChats = chats.filter((t) => (t.chapter ?? 1) === nextChapter).length;
-        if (newChats > 0) {
-          setChats((prev) =>
-            prev.map((t) =>
-              (t.chapter ?? 1) === nextChapter ? { ...t, unread: Math.max(t.unread, 1) } : t
-            )
-          );
-        }
-        const extra = [
-          newMails > 0 ? `邮箱 ${newMails} 封新邮件` : '',
-          newChats > 0 ? `聊天 ${newChats} 个新会话` : '',
-        ]
-          .filter(Boolean)
-          .join(' · ');
-        showToast(
-          `第 ${nextChapter} 章 · ${nextDef?.title ?? ''} 已解锁${extra ? `　${extra}` : ''}`
-        );
+        showToast(`第 ${nextChapter} 章 · ${nextDef?.title ?? ''} 已解锁`);
       }
       return { ok: true, feedback: def.conclusion.successText, advanced: true };
     },
-    [showToast, chapterFails, discoveredClues, caseState.flags, emails, chats]
+    [showToast, chapterFails, discoveredClues, caseState.flags]
   );
 
   const handleSignClosure = useCallback(() => {
