@@ -6,3 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# 幻光平台内部文件（不纳入开源工程）
+.lumimaker/
+.trae-html-share-packages/
+.github/
+metadata.json
+src/os/filesystem.test.ts
