@@ -357,18 +357,57 @@ export const ChatApp: React.FC<ChatAppProps> = ({
 
             {isTyping ? null : isDetective && currentNode && availableChoices.length > 0 ? (
               <div className="p-2.5 bg-[#F6EFE2] border-t-2 border-[#3A2D28]">
-                <div className="flex flex-col gap-2">
-                  {availableChoices.map((choice, idx) => (
+                {(() => {
+                  // 按 kind 分组：显式标 kind，或有 clueId 默认 case
+                  const withKind = availableChoices.map((c) => ({
+                    ...c,
+                    kind: c.kind ?? (c.clueId ? 'case' : 'casual'),
+                  }));
+                  const caseChoices = withKind.filter((c) => c.kind === 'case');
+                  const casualChoices = withKind.filter((c) => c.kind === 'casual');
+                  const hasBoth = caseChoices.length > 0 && casualChoices.length > 0;
+
+                  const renderBtn = (choice: typeof withKind[number], idx: number) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => handleChoice(choice)}
-                      className="cartoon-btn w-full text-left px-3 py-2 rounded-xl bg-[#FFFDF7] border-2 border-[#3A2D28] text-xs font-bold text-[#3A2D28] hover:bg-[#FEF3C7]"
+                      className={`cartoon-btn w-full text-left px-3 py-2 rounded-xl border-2 border-[#3A2D28] text-xs font-bold text-[#3A2D28] hover:bg-[#FEF3C7] ${
+                        choice.kind === 'case' ? 'bg-[#FFFDF7]' : 'bg-[#F6EFE2]'
+                      }`}
                     >
                       {choice.label}
                     </button>
-                  ))}
-                </div>
+                  );
+
+                  if (!hasBoth) {
+                    return (
+                      <div className="flex flex-col gap-2">
+                        {withKind.map(renderBtn)}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="flex flex-col gap-3">
+                      {caseChoices.length > 0 ? (
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-[10px] font-black text-[#B91C1C] tracking-wider px-1">
+                            案件相关
+                          </span>
+                          {caseChoices.map(renderBtn)}
+                        </div>
+                      ) : null}
+                      {casualChoices.length > 0 ? (
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-[10px] font-black text-[#6E5A52] tracking-wider px-1">
+                            随便聊聊
+                          </span>
+                          {casualChoices.map(renderBtn)}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })()}
               </div>
             ) : isDetective ? (
               <form

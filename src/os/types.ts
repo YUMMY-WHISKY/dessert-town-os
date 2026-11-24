@@ -129,6 +129,8 @@ export interface ChatChoice {
   flag?: string;
   /** 这个选项最早在第几章出现，避免提前拿到后面的线索 */
   chapter?: number;
+  /** casual=随便聊聊；case=案件相关。默认带 clueId 就是 case */
+  kind?: 'casual' | 'case';
 }
 
 export interface ChatDialogueNode {
