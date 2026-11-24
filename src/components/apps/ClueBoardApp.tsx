@@ -150,9 +150,14 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
 
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-[#FFFDF7]">
-      {/* 章节条：已解锁的都可以点回去看 */}
+      {/* 章节条：已解锁的都可以点回去看；终局指控要前四章都结案才出现 */}
       <div className="px-3 py-2 bg-[#FFF8EB] border-b-2 border-[#3A2D28] flex items-center gap-1.5 overflow-x-auto cartoon-scroll">
-        {chapters.map((ch) => {
+        {chapters
+          .filter(
+            (ch) =>
+              ch.id !== 5 || [1, 2, 3, 4].every((id) => !!caseState.chapterAnswers[id])
+          )
+          .map((ch) => {
           const done = caseState.chapter > ch.id || !!caseState.chapterAnswers[ch.id];
           const active = ch.id === viewChapter;
           const stat = chapterStats.find((s) => s.id === ch.id);
@@ -174,15 +179,15 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
                     : 'bg-[#FFFDF7] border-[#3A2D28] text-[#3A2D28] hover:bg-[#FEF3C7]'
               }`}
             >
-              <span>第{ch.id}章</span>
               {ch.id === 5 ? (
-                <span className="text-[10px] font-black px-1 rounded bg-[#DC2626]/15 text-[#B91C1C]">
-                  指控
-                </span>
+                <span>终局指控</span>
               ) : (
-                <span className="tabular-nums text-[10px] px-1 rounded bg-[#FFFDF7]/70">
-                  {stat?.found ?? 0}/{stat?.total ?? 0}
-                </span>
+                <>
+                  <span>第{ch.id}章</span>
+                  <span className="tabular-nums text-[10px] px-1 rounded bg-[#FFFDF7]/70">
+                    {stat?.found ?? 0}/{stat?.total ?? 0}
+                  </span>
+                </>
               )}
               {active && isReview ? (
                 <span className="text-[9px] font-bold opacity-70">回顾</span>
@@ -485,7 +490,7 @@ const ClosureChoice: React.FC<{ locked: boolean; onSignClosure: () => void }> = 
       ) : null}
       {refused ? (
         <p className="text-[10px] font-bold text-[#059669] mt-1.5">
-          你没有签字。提交本章结论，进入第五章。
+          你没有签字。提交本章结论，进入终局指控。
         </p>
       ) : null}
     </div>

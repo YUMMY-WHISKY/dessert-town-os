@@ -49,8 +49,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'story_ch5',
     category: 'story',
-    name: '小橘探长赛高！！',
-    description: '在第五章做出指控，达成结局 A 或 B',
+    name: '送谁吃国家饭？',
+    description: '做出指控，达成结局 A 或 B',
   },
 
   // 二、推理玩法
@@ -167,8 +167,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'hidden_perfect',
     category: 'choice',
-    name: '金牌探长！！',
-    description: '没有使用提示，找齐所有线索，用 A 或 B 结局结案',
+    name: '小橘探长赛高！！',
+    description: '没有使用提示，找齐所有线索，用 A 或 B 结局结案，而且从没触发过 C 结局',
   },
 
   // 七、细心发现
@@ -340,7 +340,8 @@ function isMet(id: string, ctx: AchievementContext): boolean {
       return (
         !flags.used_hint &&
         discoveredClues.length >= totalClues &&
-        (progress.endingsSeen.includes('A') || progress.endingsSeen.includes('B'))
+        (progress.endingsSeen.includes('A') || progress.endingsSeen.includes('B')) &&
+        !progress.endingsSeen.includes('C')
       );
     case 'hidden_ch1_first_try':
       return !!progress.firstTry[1];
