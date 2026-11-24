@@ -214,43 +214,6 @@ export const EMPTY_ACHIEVEMENT_PROGRESS: AchievementProgress = {
   timelineFirstTry: false,
 };
 
-const STORAGE_KEY = 'dessert-town-achievements-v1';
-
-export function loadAchievementProgress(): AchievementProgress {
-  if (typeof window === 'undefined') return { ...EMPTY_ACHIEVEMENT_PROGRESS };
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...EMPTY_ACHIEVEMENT_PROGRESS };
-    const parsed = JSON.parse(raw) as Partial<AchievementProgress>;
-    return {
-      unlocked: Array.isArray(parsed.unlocked) ? parsed.unlocked : [],
-      combines: typeof parsed.combines === 'number' ? parsed.combines : 0,
-      relations: Array.isArray(parsed.relations) ? parsed.relations : [],
-      feeds: typeof parsed.feeds === 'number' ? parsed.feeds : 0,
-      radioChannels: Array.isArray(parsed.radioChannels) ? parsed.radioChannels : [],
-      firstTry:
-        parsed.firstTry && typeof parsed.firstTry === 'object' ? parsed.firstTry : {},
-      endingsSeen: Array.isArray(parsed.endingsSeen) ? parsed.endingsSeen : [],
-      openedChats: Array.isArray(parsed.openedChats) ? parsed.openedChats : [],
-      browserViews: Array.isArray(parsed.browserViews) ? parsed.browserViews : [],
-      timelineAttempts:
-        typeof parsed.timelineAttempts === 'number' ? parsed.timelineAttempts : 0,
-      timelineFirstTry: parsed.timelineFirstTry === true,
-    };
-  } catch {
-    return { ...EMPTY_ACHIEVEMENT_PROGRESS };
-  }
-}
-
-export function saveAchievementProgress(progress: AchievementProgress): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-  } catch {
-    // 忽略隐私模式下的写入失败
-  }
-}
-
 export interface AchievementContext {
   flags: Record<string, boolean>;
   discoveredClues: string[];

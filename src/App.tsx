@@ -45,15 +45,17 @@ import {
   readSaveSlots,
   removeSaveSlot,
   writeSaveSlot,
+  readAchievementProgress,
+  writeAchievementProgress,
   SaveData,
   SaveSlots,
+  SAVE_SLOT_COUNT,
 } from './os/saveGame';
 import {
   ACHIEVEMENTS,
   AchievementProgress,
+  EMPTY_ACHIEVEMENT_PROGRESS,
   evaluateAchievements,
-  loadAchievementProgress,
-  saveAchievementProgress,
 } from './os/achievements';
 import { soundEngine } from './os/sound';
 import {
@@ -170,10 +172,12 @@ export default function App() {
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [achievements, setAchievements] =
-    useState<AchievementProgress>(loadAchievementProgress);
+    useState<AchievementProgress>(EMPTY_ACHIEVEMENT_PROGRESS);
   const [chapterFails, setChapterFails] = useState<Record<number, boolean>>({});
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [saveSlots, setSaveSlots] = useState<SaveSlots>(readSaveSlots);
+  const [saveSlots, setSaveSlots] = useState<SaveSlots>(
+    Array.from({ length: SAVE_SLOT_COUNT }, () => null)
+  );
   const [victoryInfo, setVictoryInfo] = useState<{
     score: number;
     summary: string;
@@ -183,6 +187,22 @@ export default function App() {
 
   const topZRef = useRef(12);
   const toastTimerRef = useRef<number | null>(null);
+
+  // 启动时异步加载云存档（完成 legacy localStorage 迁移）
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [slots, ach] = await Promise.all([
+        readSaveSlots(),
+        readAchievementProgress(),
+      ]);
+      if (!cancelled) {
+        setSaveSlots(slots);
+        setAchievements(ach);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     document.body.dataset.state = phase;
@@ -218,7 +238,7 @@ export default function App() {
 
   // 成就进度持久化（跨「从头再查一次」保留）
   useEffect(() => {
-    saveAchievementProgress(achievements);
+    writeAchievementProgress(achievements).catch(() => {});
   }, [achievements]);
 
   // 状态变化时检查是否有新成就
@@ -608,8 +628,11 @@ export default function App() {
         musicUnlocked,
         musicTrack,
       };
-      writeSaveSlot(index, data);
-      setSaveSlots(readSaveSlots());
+      (async () => {
+        await writeSaveSlot(index, data);
+        const slots = await readSaveSlots();
+        setSaveSlots(slots);
+      })();
       showToast(`已保存到存档 ${index + 1}`);
     },
     [
@@ -630,7 +653,7 @@ export default function App() {
 
   const handleLoadSlot = useCallback(
     (index: number) => {
-      const data = readSaveSlots()[index];
+      const data = saveSlots[index];
       if (!data) {
         showToast('这个存档是空的');
         return;
@@ -662,8 +685,11 @@ export default function App() {
 
   const handleDeleteSlot = useCallback(
     (index: number) => {
-      removeSaveSlot(index);
-      setSaveSlots(readSaveSlots());
+      (async () => {
+        await removeSaveSlot(index);
+        const slots = await readSaveSlots();
+        setSaveSlots(slots);
+      })();
       showToast(`已删除存档 ${index + 1}`);
     },
     [showToast]
@@ -1227,7 +1253,9 @@ export default function App() {
         chapter={caseState.chapter}
         onToggleStartMenu={() =>
           setStartMenuOpen((open) => {
-            if (!open) setSaveSlots(readSaveSlots());
+            if (!open) {
+              readSaveSlots().then(setSaveSlots).catch(() => {});
+            }
             return !open;
           })
         }

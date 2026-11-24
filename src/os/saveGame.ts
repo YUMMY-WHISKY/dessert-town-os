@@ -1,8 +1,15 @@
 import { AchievementProgress, EMPTY_ACHIEVEMENT_PROGRESS } from './achievements';
 import { CaseState, ChatThread, EmailItem, FSNode } from './types';
+import { readCloudBlob, writeCloudBlob } from './saveStore';
 
 export const SAVE_SLOT_COUNT = 3;
-const STORAGE_KEY = 'dessert-town-saves-v1';
+const CURRENT_VERSION = 1;
+
+interface FullCloudPayload {
+  version: number;
+  saves: (SaveData | null)[];
+  achievements: AchievementProgress;
+}
 
 export interface SaveData {
   version: 1;
@@ -23,8 +30,12 @@ export interface SaveData {
 
 export type SaveSlots = (SaveData | null)[];
 
-function emptySlots(): SaveSlots {
-  return Array.from({ length: SAVE_SLOT_COUNT }, () => null);
+function emptyPayload(): FullCloudPayload {
+  return {
+    version: CURRENT_VERSION,
+    saves: Array.from({ length: SAVE_SLOT_COUNT }, () => null),
+    achievements: { ...EMPTY_ACHIEVEMENT_PROGRESS },
+  };
 }
 
 function normalizeSlot(value: unknown): SaveData | null {
@@ -56,39 +67,62 @@ function normalizeSlot(value: unknown): SaveData | null {
   };
 }
 
-export function readSaveSlots(): SaveSlots {
-  if (typeof window === 'undefined') return emptySlots();
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return emptySlots();
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return emptySlots();
-    return emptySlots().map((_, index) => normalizeSlot(parsed[index]));
-  } catch {
-    return emptySlots();
-  }
+function normalizePayload(raw: unknown): FullCloudPayload | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Partial<FullCloudPayload>;
+  if (!Array.isArray(r.saves)) return null;
+  return {
+    version: typeof r.version === 'number' ? r.version : CURRENT_VERSION,
+    saves: Array.from({ length: SAVE_SLOT_COUNT }, (_, i) => normalizeSlot(r.saves?.[i])),
+    achievements: {
+      ...EMPTY_ACHIEVEMENT_PROGRESS,
+      ...(r.achievements ?? {}),
+    },
+  };
 }
 
-export function writeSaveSlot(index: number, data: SaveData): void {
-  if (typeof window === 'undefined') return;
-  const slots = readSaveSlots();
-  if (index < 0 || index >= slots.length) return;
-  slots[index] = data;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(slots));
-  } catch {
-    // 忽略隐私模式或容量不足导致的写入失败
+/** 内部：读云 blob */
+async function loadPayload(): Promise<FullCloudPayload> {
+  const raw = await readCloudBlob();
+  if (raw && raw.version === CURRENT_VERSION) {
+    const p = normalizePayload(raw);
+    if (p) return p;
   }
+  return emptyPayload();
 }
 
-export function removeSaveSlot(index: number): void {
-  if (typeof window === 'undefined') return;
-  const slots = readSaveSlots();
-  if (index < 0 || index >= slots.length) return;
-  slots[index] = null;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(slots));
-  } catch {
-    // 忽略写入失败
-  }
+async function savePayload(p: FullCloudPayload): Promise<void> {
+  await writeCloudBlob(p as any);
+}
+
+// ---- 对外 API ----
+
+export async function readSaveSlots(): Promise<SaveSlots> {
+  const p = await loadPayload();
+  return p.saves;
+}
+
+export async function writeSaveSlot(index: number, data: SaveData): Promise<void> {
+  const p = await loadPayload();
+  if (index < 0 || index >= p.saves.length) return;
+  p.saves[index] = data;
+  await savePayload(p);
+}
+
+export async function removeSaveSlot(index: number): Promise<void> {
+  const p = await loadPayload();
+  if (index < 0 || index >= p.saves.length) return;
+  p.saves[index] = null;
+  await savePayload(p);
+}
+
+export async function readAchievementProgress(): Promise<AchievementProgress> {
+  const p = await loadPayload();
+  return p.achievements;
+}
+
+export async function writeAchievementProgress(progress: AchievementProgress): Promise<void> {
+  const p = await loadPayload();
+  p.achievements = progress;
+  await savePayload(p);
 }
