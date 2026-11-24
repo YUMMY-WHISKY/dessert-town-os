@@ -117,7 +117,7 @@ const DESKTOP_SHORTCUTS: DesktopShortcut[] = [  { id: 'sc_explorer', label: '我
   { id: 'sc_pet', label: '煤球的小屋', appId: 'pet' },
   { id: 'sc_music', label: '甜点八音盒', appId: 'music' },
   { id: 'sc_achievements', label: '成就徽章', appId: 'achievements' },
-  { id: 'sc_donate', label: '给小橘加个餐', appId: 'donate' },
+  { id: 'sc_donate', label: '打赏作者', appId: 'donate' },
 ];
 
 /**
@@ -141,7 +141,7 @@ const DEFAULT_WINDOW_SPECS: Record<AppId, { title: string; width: number; height
   relations: { title: '人物关系板', width: 800, height: 560 },
   archive: { title: '镇档案室', width: 740, height: 540 },
   filing: { title: '旧东西', width: 620, height: 540 },
-  donate: { title: '给小橘加个餐', width: 520, height: 540 },
+  donate: { title: '打赏作者', width: 520, height: 420 },
 };
 
 function createInitialWindows(): WindowState[] {
