@@ -87,22 +87,23 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'd_start',
           prompt: '（她看了看门口）……探长，你还想问什么？',
           choices: [
-            { label: '20 号店庆忙坏了吧？', reply: '忙得脚不沾地。烤箱一炉接一炉，我都没停过。', kind: 'casual', next: 'd_kitchen' },
+            { label: '20 号店庆忙坏了吧？', reply: '忙得脚不沾地。烤箱一炉接一炉，我都没停过。', kind: 'casual', next: 'd_start' },
             {
-              label: '今天有谁来过店里吗？',
+              label: '案发那天有谁来过店里吗？',
               reply: '14:18 左右，布莱克从前厅进来了。',
               clueId: 'clue_chat_alibi',
               kind: 'case',
               next: 'd_who',
             },
-            { label: '下午前厅有什么动静吗？', reply: '有一杯牛奶打翻了。我出来的时候，它已经在地上。', kind: 'case', next: 'd_milk' },
+            { label: '案发那天前厅有什么动静吗？', reply: '有一杯牛奶打翻了。我出来的时候，它已经在地上。', kind: 'case', next: 'd_milk' },
+            { label: '那炉蛋挞的定时器，案发那天没出什么问题吧？', reply: '……你也注意到了？它好像提前响了，我那时候不在灶台边。', kind: 'case', chapter: 2, next: 'd_kitchen' },
           ],
         },
         {
           id: 'd_kitchen',
           prompt: '（她搓着围裙，声音低了一点）……那炉蛋挞的定时器，好像不太对。',
           choices: [
-            { label: '怎么不对？', reply: '它好像提前响了，我那时候不在灶台边。', kind: 'case', next: 'd_left' },
+            { label: '怎么不对？', reply: '它好像提前响了，我那时候不在灶台边。', kind: 'case', chapter: 2, next: 'd_left' },
             { label: '提前多久响的？', reply: '说不好……我只记得还没到三点。探长，这个要紧吗？', clueId: 'clue_milu_slip', kind: 'case', chapter: 2, next: 'd_start' },
           ],
         },
@@ -217,7 +218,7 @@ export const ALL_CHATS: ChatThread[] = [
           prompt: '（他把手机夹在肩上）探长，你还想问哪件事？',
           choices: [
             {
-              label: '今天跑了几单？',
+              label: '案发那天你跑了几单？',
               reply: '十七单。镇南果园跑了两趟，驿站 14:05 有打卡。',
               clueId: 'clue_achai_clock',
               kind: 'case',
@@ -225,13 +226,13 @@ export const ALL_CHATS: ChatThread[] = [
             },
             {
               label: '奶泡泡甜品铺常让你送什么？',
-              reply: '面粉、黄油，偶尔冷链箱。今天那个特别沉。',
+              reply: '面粉、黄油，偶尔冷链箱。那天那个特别沉。',
               kind: 'case',
               next: 'a_weight',
             },
             {
               label: '老街那边的单子多吗？',
-              reply: '不多。今天倒有一单，送到老街 7 号。',
+              reply: '不多。案发那天倒有一单，送到老街 7 号。',
               clueId: 'clue_box_to_oldstreet',
               kind: 'case',
               next: 'a_box',
@@ -333,10 +334,10 @@ export const ALL_CHATS: ChatThread[] = [
           prompt: '行。你还想问什么？',
           choices: [
             {
-              label: '今天店里生意怎么样？',
-              reply: '两桌客人。隔壁 20 号店庆，人都往那边去了。',
-              kind: 'casual',
-              next: 'b_time',
+              label: '案发那天你在奶泡泡甜品铺待了多久？',
+              reply: '我约了波比谈授权。她说两点在店里等我，我 14:18 才到，前厅没人。',
+              kind: 'case',
+              next: 'b_visit',
             },
             {
               label: '听说你最近在筹钱？',
@@ -344,28 +345,21 @@ export const ALL_CHATS: ChatThread[] = [
               kind: 'case',
               next: 'b_account',
             },
-            {
-              label: '下午你去奶泡泡甜品铺做什么？',
-              reply: '我约了波比谈授权。',
-              kind: 'case',
-              next: 'b_visit',
-            },
           ],
         },
         {
           id: 'b_visit',
-          prompt: '（他别过脸）她说两点在店里等我。我 14:18 才到，前厅没人。',
+          prompt: '（他别过脸）……不到四分钟，喊了两声没人应，我就走了。',
           choices: [
-            { label: '你等了多久？', reply: '不到四分钟，喊了两声没人应，我就走了。', kind: 'case', next: 'b_start' },
             { label: '你走的时候，柜台有什么不对吗？', reply: '没注意，她放我鸽子，我当时一肚子火。', kind: 'case', next: 'b_start' },
+            { label: '你空手出来的？', reply: '对。监控你们不是有吗？', kind: 'case', chapter: 4, next: 'b_start' },
           ],
         },
         {
-          id: 'b_time',
-          prompt: '（他哼了一声）四分钟，够干什么？',
+          id: 'b_account',
+          prompt: '（他哼了一声）你们要真觉得是我，就去查账。',
           choices: [
-            { label: '四分钟能做什么？', reply: '我怎么知道，不关我的事，我早就走了。', kind: 'case', next: 'b_start' },
-            { label: '有人看见你空手出来吗？', reply: '监控。你们不是有吗？', kind: 'case', chapter: 4, next: 'b_start' },
+            { label: '好，把你银行账号给我', reply: '自己去查。heimao_black@nailong.com。', clueId: 'clue_blake_account', kind: 'case', chapter: 4, next: 'b_start' },
           ],
         },
       ],
@@ -404,7 +398,7 @@ export const ALL_CHATS: ChatThread[] = [
           prompt: '探长，还有别的事吗？',
           choices: [
             {
-              label: '今天办公室忙吗？',
+              label: '案发那天办公室忙吗？',
               reply: '三份产权申请，一份改造对接。都在流程里。',
               kind: 'case',
               next: 'g_fire',
