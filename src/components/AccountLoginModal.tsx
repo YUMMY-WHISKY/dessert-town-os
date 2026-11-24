@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, LogIn } from 'lucide-react';
 import { BLAKE_ACCOUNT, POPPY_ACCOUNT } from '../os/seedData';
+import { soundEngine } from '../os/sound';
 
 export type LoginAccount = 'poppy' | 'black';
 
@@ -33,6 +34,7 @@ export const AccountLoginModal: React.FC<AccountLoginModalProps> = ({
       setError(false);
       setEmail('');
       setPassword('');
+      soundEngine.playLoginResult(true);
       onSuccess('poppy');
       return;
     }
@@ -43,9 +45,11 @@ export const AccountLoginModal: React.FC<AccountLoginModalProps> = ({
       setError(false);
       setEmail('');
       setPassword('');
+      soundEngine.playLoginResult(true);
       onSuccess('black');
       return;
     }
+    soundEngine.playLoginResult(false);
     setError(true);
   };
 

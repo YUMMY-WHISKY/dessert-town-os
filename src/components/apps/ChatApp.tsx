@@ -120,6 +120,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeThread || !replyText.trim()) return;
+    soundEngine.playSend();
     onSendReply(activeThread.id, replyText.trim());
     setReplyText('');
   };

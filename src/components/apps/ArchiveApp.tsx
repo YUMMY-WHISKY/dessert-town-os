@@ -38,12 +38,12 @@ export const ArchiveApp: React.FC<ArchiveAppProps> = ({
     if (!selected) return;
     const normalized = code.trim().replace(/\s/g, '');
     if (normalized === selected.code) {
-      soundEngine.playClueFound();
+      soundEngine.playUnlock();
       setUnlocked((prev) => [...prev, selected.id]);
       setCode('');
       if (selected.flag) onFlag(selected.flag);
     } else {
-      soundEngine.playClick();
+      soundEngine.playError();
       setShake(true);
       window.setTimeout(() => setShake(false), 320);
     }

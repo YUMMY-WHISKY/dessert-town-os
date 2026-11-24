@@ -309,8 +309,7 @@ export const DesktopPet: React.FC<DesktopPetProps> = ({
     if (bubbleTimerRef.current !== null) window.clearTimeout(bubbleTimerRef.current);
     bubbleTimerRef.current = window.setTimeout(() => setBubble(null), 4200);
 
-    soundEngine.playTone(760, 0.09, 'sine', 0.04);
-    window.setTimeout(() => soundEngine.playTone(980, 0.12, 'sine', 0.035), 110);
+    soundEngine.playMeow();
   }, [chapter, fetchActive]);
 
   // ===== 煤球抓文件游戏 =====

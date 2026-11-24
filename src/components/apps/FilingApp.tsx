@@ -61,7 +61,7 @@ export const FilingApp: React.FC<FilingAppProps> = ({
     }
     const wrong = ITEMS.filter((item) => assignments[item.id] !== item.answer).length;
     if (wrong === 0) {
-      soundEngine.playClueFound();
+      soundEngine.playStamp();
       setChecked({ ok: true, wrong: 0 });
       onDiscoverClue('clue_poppy_filing');
     } else {

@@ -57,6 +57,7 @@ export const MailApp: React.FC<MailAppProps> = ({
     filteredEmails.find((m) => m.id === selectedId) ?? filteredEmails[0] ?? null;
 
   const handleSelectEmail = (mail: EmailItem) => {
+    soundEngine.playPaper();
     setSelectedId(mail.id);
     onMarkRead(mail.id);
     if (mail.flagOnRead) onFlag(mail.flagOnRead);

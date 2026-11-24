@@ -49,7 +49,7 @@ export const MusicBoxApp: React.FC<MusicBoxAppProps> = ({
     const next = [...seq, idx].slice(-SECRET_ORDER.length);
     setSeq(next);
     if (next.length === SECRET_ORDER.length && next.every((v, i) => v === SECRET_ORDER[i])) {
-      soundEngine.playClueFound();
+      soundEngine.playUnlock();
       onUnlockMusic();
       setSeq([]);
     }

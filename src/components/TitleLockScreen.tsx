@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Lock, LogIn } from 'lucide-react';
 import { AVATAR_SHIBA_URL, WALLPAPER_URL } from '../os/seedData';
+import { soundEngine } from '../os/sound';
 
 interface TitleLockScreenProps {
   onStart: () => void;
@@ -29,10 +30,16 @@ export const TitleLockScreen: React.FC<TitleLockScreenProps> = ({ onStart }) => 
   useEffect(() => {
     if (stage !== 'boot') return;
     if (bootStep < BOOT_LINES.length - 1) {
-      const timer = window.setTimeout(() => setBootStep((s) => s + 1), 380);
+      const timer = window.setTimeout(() => {
+        soundEngine.playType();
+        setBootStep((s) => s + 1);
+      }, 380);
       return () => window.clearTimeout(timer);
     }
-    const timer = window.setTimeout(() => setStage('locked'), 700);
+    const timer = window.setTimeout(() => {
+      soundEngine.playNotify();
+      setStage('locked');
+    }, 700);
     return () => window.clearTimeout(timer);
   }, [bootStep, stage]);
 
@@ -42,9 +49,11 @@ export const TitleLockScreen: React.FC<TitleLockScreenProps> = ({ onStart }) => 
     e.preventDefault();
     if (password.trim().toLowerCase() === BOOT_PASSWORD) {
       setError(false);
+      soundEngine.playBoot();
       onStart();
       return;
     }
+    soundEngine.playLoginResult(false);
     setError(true);
   };
 

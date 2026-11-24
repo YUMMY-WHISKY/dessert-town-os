@@ -69,7 +69,7 @@ export const PhotoViewerApp: React.FC<PhotoViewerAppProps> = ({
     if (!targetId) return;
     const target = nodes.find((n) => n.id === targetId);
     if (!target) return;
-    soundEngine.playClueFound();
+    soundEngine.playPaper();
     setLayerOver(target);
     setInspectedHotspot(null);
     setImgError(false);

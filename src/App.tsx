@@ -241,7 +241,7 @@ export default function App() {
       .map((id) => ACHIEVEMENTS.find((a) => a.id === id)?.name ?? id)
       .join('、');
     showToast(`成就解锁：${names}`, { silent: true });
-    soundEngine.playClueFound();
+    soundEngine.playAchievement();
   }, [
     caseState.flags,
     caseState.chapterAnswers,
@@ -448,7 +448,7 @@ export default function App() {
   );
 
   const handleCloseWindow = useCallback((winId: string) => {
-    soundEngine.playClick();
+    soundEngine.playCloseWindow();
     setWindows((prev) => prev.filter((w) => w.id !== winId));
     setActiveWindowId((prev) => (prev === winId ? null : prev));
   }, []);

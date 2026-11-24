@@ -60,7 +60,7 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
       : WHISPERS[lineIndex % WHISPERS.length];
 
   const handleFeed = () => {
-    soundEngine.playClick();
+    soundEngine.playMeow();
     onFeed();
     setPetted(false);
     setHintLevel(0);
@@ -75,7 +75,7 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
   };
 
   const handlePet = () => {
-    soundEngine.playTone(880, 0.1, 'sine', 0.05);
+    soundEngine.playPurr();
     setMood('curious');
     setPetted(true);
     setHintLevel(0);

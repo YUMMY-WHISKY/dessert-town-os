@@ -138,6 +138,7 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
     const res = onCombine(selected[0], selected[1], relation);
     if (res.result) {
       const target = clues.find((c) => c.id === res.result);
+      soundEngine.playCombine();
       onDiscoverClue(res.result);
       setComboMsg({ ok: true, text: `推理成立：${target?.title ?? '新的矛盾'}` });
     } else if (!res.pairExists) {
@@ -529,7 +530,7 @@ const FilingPuzzle: React.FC<{
     }
     const wrong = FILING_ITEMS.filter((item) => assignments[item.id] !== item.answer).length;
     if (wrong === 0) {
-      soundEngine.playClueFound();
+      soundEngine.playStamp();
       setChecked({ ok: true, wrong: 0 });
       onDiscoverClue('clue_poppy_filing');
     } else {
