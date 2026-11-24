@@ -111,7 +111,7 @@ const DESKTOP_SHORTCUTS: DesktopShortcut[] = [  { id: 'sc_explorer', label: '我
   { id: 'sc_relations', label: '人物关系板', appId: 'relations' },
   { id: 'sc_archive', label: '镇档案室', appId: 'archive' },
   { id: 'sc_filing', label: '旧东西', appId: 'filing' },
-  { id: 'sc_pet', label: '店猫煤球', appId: 'pet' },
+  { id: 'sc_pet', label: '煤球的小屋', appId: 'pet' },
   { id: 'sc_music', label: '甜点八音盒', appId: 'music' },
   { id: 'sc_achievements', label: '成就徽章', appId: 'achievements' },
 ];
@@ -131,7 +131,7 @@ const DEFAULT_WINDOW_SPECS: Record<AppId, { title: string; width: number; height
   clueboard: { title: '破案手账', width: 800, height: 550 },
   achievements: { title: '成就徽章', width: 680, height: 540 },
   browser: { title: 'PawNet 浏览器', width: 760, height: 520 },
-  pet: { title: '店猫煤球小屋', width: 480, height: 440 },
+  pet: { title: '煤球的小屋', width: 480, height: 440 },
   timeline: { title: '时间线白板', width: 840, height: 540 },
   radio: { title: '甜点镇广播', width: 480, height: 440 },
   relations: { title: '人物关系板', width: 800, height: 560 },

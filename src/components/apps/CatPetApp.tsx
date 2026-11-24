@@ -96,8 +96,44 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
   return (
     <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-5 bg-[#FFFDF7] text-center">
       <div className="relative mb-3">
-        <div className="w-24 h-24 rounded-full border-[3px] border-[#3A2D28] bg-[#FEE2E2] shadow-[4px_4px_0_#3A2D28] flex items-center justify-center text-4xl">
-          🐱
+        <div className="w-28 h-28 rounded-full border-[3px] border-[#3A2D28] bg-[#FFF3E0] shadow-[4px_4px_0_#3A2D28] flex items-center justify-center overflow-hidden">
+          <svg viewBox="0 0 64 64" className="w-[88px] h-[88px]" aria-label="煤球">
+            {/* 尾巴 */}
+            <path d="M48 49 C59 48 61 37 55 30" fill="none" stroke="#3A2D28" strokeWidth="7" strokeLinecap="round" />
+            <path d="M48 49 C58 48 60 37 55 31" fill="none" stroke="#F59E5B" strokeWidth="4" strokeLinecap="round" />
+            {/* 身体 */}
+            <ellipse cx="32" cy="44" rx="15.5" ry="12.5" fill="#F59E5B" stroke="#3A2D28" strokeWidth="2.4" />
+            <ellipse cx="32" cy="47" rx="8.5" ry="7" fill="#FFE8C7" />
+            <path d="M21 38 q3 4 0 7" stroke="#D97706" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M24 36 q3 4 0 7" stroke="#D97706" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+            <path d="M43 38 q-3 4 0 7" stroke="#D97706" strokeWidth="2" strokeLinecap="round" fill="none" />
+            {/* 前爪 */}
+            <ellipse cx="24" cy="57.5" rx="4.6" ry="3.4" fill="#F59E5B" stroke="#3A2D28" strokeWidth="2" />
+            <ellipse cx="40" cy="57.5" rx="4.6" ry="3.4" fill="#F59E5B" stroke="#3A2D28" strokeWidth="2" />
+            {/* 耳朵 */}
+            <path d="M20 17 L16.5 4.5 L29 11.5 Z" fill="#F59E5B" stroke="#3A2D28" strokeWidth="2.2" strokeLinejoin="round" />
+            <path d="M44 17 L47.5 4.5 L35 11.5 Z" fill="#F59E5B" stroke="#3A2D28" strokeWidth="2.2" strokeLinejoin="round" />
+            <path d="M21 14.5 L19 8.5 L25.5 12 Z" fill="#FFB3C1" />
+            <path d="M43 14.5 L45 8.5 L38.5 12 Z" fill="#FFB3C1" />
+            {/* 头 */}
+            <circle cx="32" cy="27" r="15" fill="#F59E5B" stroke="#3A2D28" strokeWidth="2.4" />
+            <path d="M27.5 13.5 l2 4" stroke="#D97706" strokeWidth="2" strokeLinecap="round" />
+            <path d="M32 12.5 l0 4.5" stroke="#D97706" strokeWidth="2" strokeLinecap="round" />
+            <path d="M36.5 13.5 l-2 4" stroke="#D97706" strokeWidth="2" strokeLinecap="round" />
+            <ellipse cx="32" cy="34" rx="8.5" ry="6.5" fill="#FFE8C7" opacity="0.85" />
+            {/* 眼睛 */}
+            <ellipse cx="26.5" cy="26" rx="2.4" ry="3.1" fill="#3A2D28" />
+            <ellipse cx="37.5" cy="26" rx="2.4" ry="3.1" fill="#3A2D28" />
+            <circle cx="25.7" cy="25" r="0.9" fill="#FFFDF7" />
+            <circle cx="36.7" cy="25" r="0.9" fill="#FFFDF7" />
+            {/* 鼻子与嘴 */}
+            <path d="M32 30 l-2.2 1.6 h4.4 Z" fill="#FF758F" />
+            <path d="M32 31.6 q-2.2 2.6 -4.5 0" stroke="#3A2D28" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            <path d="M32 31.6 q2.2 2.6 4.5 0" stroke="#3A2D28" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            {/* 胡须 */}
+            <path d="M18 28 h-5.5 M18 31 h-5.5" stroke="#3A2D28" strokeWidth="1.2" strokeLinecap="round" opacity="0.7" />
+            <path d="M46 28 h5.5 M46 31 h5.5" stroke="#3A2D28" strokeWidth="1.2" strokeLinecap="round" opacity="0.7" />
+          </svg>
         </div>
         <div className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-[#FFB830] border-2 border-[#3A2D28] text-[10px] font-black text-[#3A2D28] flex items-center gap-1">
           <Heart className="w-3 h-3 fill-[#FF758F] text-[#FF758F]" />
@@ -105,7 +141,7 @@ export const CatPetApp: React.FC<CatPetAppProps> = ({
         </div>
       </div>
 
-      <h3 className="text-base font-black text-[#3A2D28] mb-0.5">店猫 · 煤球的小屋</h3>
+      <h3 className="text-base font-black text-[#3A2D28] mb-0.5">煤球的小屋</h3>
       <p className="text-[11px] text-[#6E5A52] mb-4">
         状态：{mood === 'happy' ? '开心摇尾巴' : '萌萌凝视中'} · 已投喂小鱼干 {feedCount} 条
       </p>
