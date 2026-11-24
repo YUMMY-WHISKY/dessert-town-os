@@ -24,8 +24,8 @@ export const ALL_CHATS: ChatThread[] = [
           prompt: '（她看了看门口）……探长，你想聊点什么？',
           choices: [
             { label: '这两天累不累？', reply: '还行，就是烤箱一炉接一炉，脚不沾地。', kind: 'casual', next: 'd_start' },
-            { label: '你住镇子哪边？', reply: '后街。走路过来十分钟，我每天都第一个到。', kind: 'casual', next: 'd_start' },
-            { label: '煤球平时听你的话吗？', reply: '只听鱼干的。谁手里有鱼干，它听谁的。', kind: 'casual', next: 'd_start' },
+            { label: '你住镇子哪边？', reply: '后街，走路过来十分钟，我每天都第一个到。', kind: 'casual', next: 'd_start' },
+            { label: '煤球平时听你的话吗？', reply: '它啊，谁手里有鱼干，它就听谁的。', kind: 'casual', next: 'd_start' },
             {
               label: '案发那天有谁来过店里吗？',
               reply: '14:18 左右，布莱克从前厅进来了。',
@@ -33,7 +33,7 @@ export const ALL_CHATS: ChatThread[] = [
               kind: 'case',
               next: 'd_who',
             },
-            { label: '案发那天前厅有什么动静吗？', reply: '有一杯牛奶打翻了。我出来的时候，它已经在地上。', kind: 'case', next: 'd_milk' },
+            { label: '案发那天前厅有什么动静吗？', reply: '有一杯牛奶打翻了，我出来的时候，它已经在地上。', kind: 'case', next: 'd_milk' },
             { label: '那炉蛋挞的定时器，案发那天没出什么问题吧？', reply: '……你也注意到了？它好像提前响了，我那时候不在灶台边。', kind: 'case', chapter: 2, next: 'd_kitchen' },
           ],
         },
@@ -65,7 +65,7 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'd_who2',
           prompt: '（她小声补充）四分钟，说长不长，说短也不短。',
           choices: [
-            { label: '四分钟能做什么？', reply: '拿一样小东西，够了。可要是搬走一整个抽屉……不够。', kind: 'case', next: 'd_start' },
+            { label: '四分钟能做什么？', reply: '我不知道。。', kind: 'case', next: 'd_start' },
             { label: '这件事你告诉过别人吗？', reply: '我谁都没说。波比姐让我别乱讲。', kind: 'case', next: 'd_start' },
           ],
         },
@@ -107,7 +107,7 @@ export const ALL_CHATS: ChatThread[] = [
           choices: [
             { label: '最近单子多吗？', reply: '多。镇南果园的芒果熟了，天天往镇上送。', kind: 'casual', next: 'a_start' },
             { label: '这车一趟能装多少箱？', reply: '塞满二十箱。再多就得绑车顶了。', kind: 'casual', next: 'a_start' },
-            { label: '中午吃了吗？', reply: '路边啃了个馒头。这趟送完去蹭个蛋挞。', kind: 'casual', next: 'a_start' },
+            { label: '中午吃了吗？', reply: '路边啃了个馒头，这趟送完去蹭个蛋挞。', kind: 'casual', next: 'a_start' },
             {
               label: '案发那天你跑了几单？',
               reply: '十七单。镇南果园跑了两趟，驿站 14:05 有打卡。',
@@ -117,13 +117,13 @@ export const ALL_CHATS: ChatThread[] = [
             },
             {
               label: '奶泡泡甜品铺常让你送什么？',
-              reply: '面粉、黄油，偶尔冷链箱。那天那个特别沉。',
+              reply: '面粉、黄油，偶尔冷链箱。',
               kind: 'case',
               next: 'a_weight',
             },
             {
               label: '老街那边的单子多吗？',
-              reply: '不多。案发那天倒有一单，送到老街 7 号。',
+              reply: '不多，案发那天倒有一单。',
               clueId: 'clue_box_to_oldstreet',
               kind: 'case',
               chapter: 2,
@@ -133,7 +133,7 @@ export const ALL_CHATS: ChatThread[] = [
         },
         {
           id: 'a_alibi',
-          prompt: '（阿柴发来一张驿站打卡截图）看吧，我人在镇南。那箱子后来是我送去老街 7 号的。',
+          prompt: '（阿柴发来一张驿站打卡截图）看吧，我人在镇南。',
           choices: [
             { label: '箱子里装的是什么？', reply: '不知道啊，封得好好的。我就是个送货的。', kind: 'case', next: 'a_start' },
             { label: '你送到哪了？', reply: '送到老街 7 号门口。波比姐让我放下就走。', kind: 'case', next: 'a_start' },
@@ -145,7 +145,7 @@ export const ALL_CHATS: ChatThread[] = [
           choices: [
             {
               label: '出发和签收差多少？',
-              reply: '13:52 我送到店里时 3.6，17:30 从后门取走时 4.8，多了 1.2 公斤。我没往里放冰袋。',
+              reply: '13:52 我送到店里时 3.6，17:30 从后门取走时 4.8，多了 1.2 公斤。我记得我没往里面放冰袋。',
               clueId: 'clue_cold_chain_weight',
               kind: 'case',
               chapter: 2,
@@ -165,8 +165,8 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'a_box',
           prompt: '（他压低声音）老街 7 号那地方不是空了好多年吗？她还让我别写进系统。',
           choices: [
-            { label: '为什么让你别写进系统？', reply: '不知道，还多给了运费。我以为是私活。', kind: 'case', next: 'a_start' },
-            { label: '你看见谁接货了吗？', reply: '没有。她让我放门口就走了。', kind: 'case', next: 'a_start' },
+            { label: '为什么让你别写进系统？', reply: '不知道，还多给了运费，我以为是私活。', kind: 'case', next: 'a_start' },
+            { label: '你看见谁接货了吗？', reply: '没有，她让我放门口就走了。', kind: 'case', next: 'a_start' },
           ],
         },
       ],
@@ -191,15 +191,15 @@ export const ALL_CHATS: ChatThread[] = [
           choices: [
             {
               label: '这两天店里生意怎么样？',
-              reply: '两桌客人。隔壁搞店庆，人都往那边挤。',
+              reply: '两桌客人。隔壁搞店庆，人都往那边去了。',
               kind: 'casual',
               next: 'b_business',
             },
             { label: '这家店开几年了？', reply: '十年。开的时候这条街还没这么冷清。', kind: 'casual', next: 'b_start' },
-            { label: '豆子都自己烘？', reply: '自己烘。机器小，一次两公斤。', kind: 'casual', next: 'b_start' },
+            { label: '豆子都自己烘？', reply: '对，机器小，一次两公斤。', kind: 'casual', next: 'b_start' },
             {
               label: '案发那天你去奶泡泡甜品铺做什么？',
-              reply: '我约了波比谈授权。她说两点在店里等我。',
+              reply: '我去找波比谈授权。',
               kind: 'case',
               next: 'b_visit',
             },
@@ -223,7 +223,7 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'b_visit',
           prompt: '（他别过脸）我 14:18 才到，前厅一个人都没有，喊了两声也没人应。',
           choices: [
-            { label: '你等了多久？', reply: '不到四分钟吧。她放我鸽子，我就走了。', kind: 'case', next: 'b_start' },
+            { label: '你等了多久？', reply: '不到四分钟吧，她放我鸽子，我就走了。', kind: 'case', next: 'b_start' },
             { label: '你走的时候，柜台有什么不对吗？', reply: '没注意，我当时一肚子火。', kind: 'case', next: 'b_start' },
             { label: '你空手出来的？', reply: '对。监控你们不是有吗？', kind: 'case', chapter: 4, next: 'b_start' },
           ],
@@ -232,7 +232,7 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'b_account',
           prompt: '（他哼了一声）你们要真觉得是我，就去查账。',
           choices: [
-            { label: '好，把你银行账号给我', reply: '自己去查。heimao_black@nailong.com。', clueId: 'clue_blake_account', kind: 'case', next: 'b_start' },
+            { label: '好，把你账号给我', reply: 'heimao_black@nailong.com。', clueId: 'clue_blake_account', kind: 'case', next: 'b_start' },
           ],
         },
       ],
@@ -255,18 +255,18 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'g_start',
           prompt: '探长，还有别的事吗？',
           choices: [
-            { label: '办公室平时都忙些什么？', reply: '文件、会、盖章，三样轮着来。', kind: 'casual', next: 'g_start' },
-            { label: '您在这儿干多少年了？', reply: '快三十年。镇上的事，我比谁都熟。', kind: 'casual', next: 'g_start' },
-            { label: '周末能歇口气吗？', reply: '歇不了。上面催得紧。', kind: 'casual', next: 'g_start' },
+            { label: '办公室平时都忙些什么？', reply: '文件、开会、盖章，啥都我干。', kind: 'casual', next: 'g_start' },
+            { label: '您在这儿干多少年了？', reply: '快三十年了吧，镇上的事，我比谁都熟。', kind: 'casual', next: 'g_start' },
+            { label: '周末能歇口气吗？', reply: '歇不了，上面催得紧。', kind: 'casual', next: 'g_start' },
             {
               label: '案发那天办公室忙吗？',
-              reply: '三份产权申请，一份改造对接。都在流程里。',
+              reply: '三份产权申请，一份改造对接。',
               kind: 'case',
               next: 'g_fire',
             },
             {
               label: '改造方案进行到哪了？',
-              reply: '公示完了，下一步是迁离。',
+              reply: '公示完了，马上着手组织商户迁离了。',
               kind: 'case',
               next: 'g_files',
             },
@@ -280,11 +280,11 @@ export const ALL_CHATS: ChatThread[] = [
         },
         {
           id: 'g_fire',
-          prompt: '（他停了几秒才回）三份产权申请里，有一份是老街 7 号的，压了很久了。……2006 年那次电路验收，也是我签的字。',
+          prompt: '（他回得很慢）三份产权申请走流程，有一份老街 7 号的，材料不全，驳回去了。',
           choices: [
             {
               label: '压了很久？缺的是什么？',
-              reply: '缺一页继承证明。补上，就能继续走流程。',
+              reply: '材料不全就驳。程序上没毛病。',
               kind: 'case',
               next: 'g_start',
             },
@@ -328,14 +328,14 @@ export const ALL_CHATS: ChatThread[] = [
       {
         id: 'p1',
         sender: 'them',
-        text: '（这条消息没有发送时间）小橘探长，如果你在翻这些，说明你已经比我想象的走得远了。',
+        text: '（自动发送）小橘探长，如果你在翻这些，说明你已经比我想象的走得远了。',
         time: '——',
         chapter: 4,
       },
       {
         id: 'p2',
         sender: 'them',
-        text: '（这条消息没有发送时间）我没有想害任何人。我只是想讨回一个公道。',
+        text: '（自动发送）我没有想害任何人。老街 7 号那场火……我不该让它烧到现在。',
         time: '——',
         chapter: 4,
       },
@@ -349,7 +349,7 @@ export const ALL_CHATS: ChatThread[] = [
           prompt: '（头像一直是灰的。发出去的消息，过很久才回。）',
           choices: [
             { label: '最近还好吗？', reply: '（隔了很久）……我很好。你别担心我。', kind: 'casual', next: 'p_start' },
-            { label: '蛋挞的方子还是老样子吗？', reply: '老样子。黄油要打发到发白，一步都不能省。', kind: 'casual', next: 'p_start' },
+            { label: '蛋挞的方子还是老样子吗？', reply: '老样子，黄油要打发到发白，一步都不能省。', kind: 'casual', next: 'p_start' },
             { label: '你小时候也这么早起吗？', reply: '我妈说，我一岁半就蹲在灶台边等蛋挞出炉。', kind: 'casual', next: 'p_start' },
             {
               label: '案发那天，你在店里吗？',
@@ -357,42 +357,13 @@ export const ALL_CHATS: ChatThread[] = [
               kind: 'case',
               next: 'p_store',
             },
-            {
-              label: '配方到底是谁拿走的？',
-              reply: '没有人拿走。是我自己收起来的。',
-              kind: 'case',
-              next: 'p_recipe',
-            },
-            {
-              label: '2006 年那场火，和咕咕有关吗？',
-              reply: '……你查到那一步了。',
-              kind: 'case',
-              next: 'p_fire',
-            },
           ],
         },
         {
           id: 'p_store',
           prompt: '（很久没有回复。消息下面显示：定时发送。）',
           choices: [
-            { label: '为什么要做这一场局？', reply: '我要的不是配方，是一个所有人都看得见的答案。', kind: 'case', next: 'p_start' },
             { label: '你知道这样会把自己也搭进去吗？', reply: '我知道。我算过。', kind: 'case', next: 'p_start' },
-          ],
-        },
-        {
-          id: 'p_recipe',
-          prompt: '那套配方从来就不是被偷的。是我把它藏进冷链箱，让它看起来像被带走。',
-          choices: [
-            { label: '所以你故意调走米露、加单去老街 7 号？', reply: '米露什么都不知道。她只是听话。', kind: 'case', next: 'p_start' },
-            { label: '为什么要让所有人以为配方丢了？', reply: '因为丢了才有人查。不丢，谁会在意老街 7 号。', kind: 'case', next: 'p_start' },
-          ],
-        },
-        {
-          id: 'p_fire',
-          prompt: '（输入框亮了很久，最后只有一行）2006 年那份验收单，是他签的字。',
-          choices: [
-            { label: '你有证据吗？', reply: '我攒了十年。都在旧东西里。', kind: 'case', next: 'p_start' },
-            { label: '你打算怎么办？', reply: '明天十点，发布会。我要他在所有人面前，念一遍那份验收单。', kind: 'case', next: 'p_start' },
           ],
         },
       ],
