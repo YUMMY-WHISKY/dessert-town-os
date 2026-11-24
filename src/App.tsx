@@ -722,11 +722,28 @@ export default function App() {
 
       if (chapterId < 5) {
         const nextDef = CHAPTERS.find((c) => c.id === nextChapter);
-        showToast(`第 ${nextChapter} 章 · ${nextDef?.title ?? ''} 已解锁`);
+        const newMails = emails.filter((m) => (m.chapter ?? 1) === nextChapter).length;
+        const newChats = chats.filter((t) => (t.chapter ?? 1) === nextChapter).length;
+        if (newChats > 0) {
+          setChats((prev) =>
+            prev.map((t) =>
+              (t.chapter ?? 1) === nextChapter ? { ...t, unread: Math.max(t.unread, 1) } : t
+            )
+          );
+        }
+        const extra = [
+          newMails > 0 ? `邮箱 ${newMails} 封新邮件` : '',
+          newChats > 0 ? `聊天 ${newChats} 个新会话` : '',
+        ]
+          .filter(Boolean)
+          .join(' · ');
+        showToast(
+          `第 ${nextChapter} 章 · ${nextDef?.title ?? ''} 已解锁${extra ? `　${extra}` : ''}`
+        );
       }
       return { ok: true, feedback: def.conclusion.successText, advanced: true };
     },
-    [showToast, chapterFails, discoveredClues, caseState.flags]
+    [showToast, chapterFails, discoveredClues, caseState.flags, emails, chats]
   );
 
   const handleSignClosure = useCallback(() => {
@@ -801,6 +818,8 @@ export default function App() {
   const visEmails = visibleEmails(emails, contentChapter);
   const visChats = visibleChats(chats, contentChapter);
   const archiveDrawers = ARCHIVE_DRAWERS;
+  const unreadMailCount = visEmails.filter((m) => !m.read).length;
+  const unreadChatCount = visChats.filter((t) => t.unread > 0).length;
 
   return (
     <CollectProvider
@@ -874,7 +893,19 @@ export default function App() {
                 {sc.isTrash ? (
                   <TrashIcon hasItems={trashCount > 0} className="w-11 h-11" />
                 ) : (
-                  <AppIcon appId={sc.appId} className="w-11 h-11" />
+                  <div className="relative">
+                    <AppIcon appId={sc.appId} className="w-11 h-11" />
+                    {sc.appId === 'mail' && unreadMailCount > 0 ? (
+                      <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-[#DC2626] text-[#FFFDF7] text-[9px] font-black flex items-center justify-center border border-[#FFFDF7] tabular-nums">
+                        {unreadMailCount > 99 ? '99+' : unreadMailCount}
+                      </span>
+                    ) : null}
+                    {sc.appId === 'chat' && unreadChatCount > 0 ? (
+                      <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-[#DC2626] text-[#FFFDF7] text-[9px] font-black flex items-center justify-center border border-[#FFFDF7] tabular-nums">
+                        {unreadChatCount > 99 ? '99+' : unreadChatCount}
+                      </span>
+                    ) : null}
+                  </div>
                 )}
                 <span className="text-[11px] font-bold text-[#3A2D28] leading-tight drop-shadow-[0_1px_0_rgba(255,255,255,0.9)]">
                   {sc.label}

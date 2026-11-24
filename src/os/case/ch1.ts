@@ -522,7 +522,7 @@ export const CH1_EMAILS: EmailItem[] = [
     folder: 'inbox',
     read: false,
     starred: false,
-    chapter: 3,
+    chapter: 1,
     account: 'black',
     body: [
       '布莱克：',
