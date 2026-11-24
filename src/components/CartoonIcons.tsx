@@ -319,6 +319,19 @@ export const AppIcon: React.FC<{ appId: AppId; className?: string }> = ({
           <path d="M32 24H38M32 29H38M32 34H38" stroke="#92400E" strokeWidth="2" strokeLinecap="round" />
         </svg>
       );
+    case 'donate':
+      return (
+        <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true">
+          <path
+            d="M24 40C24 40 8 29.5 8 18.5C8 13.8 11.8 10 16.5 10C19.3 10 21.9 11.4 24 13.8C26.1 11.4 28.7 10 31.5 10C36.2 10 40 13.8 40 18.5C40 29.5 24 40 24 40Z"
+            fill="#FF758F"
+            stroke="#3A2D28"
+            strokeWidth="2.5"
+            strokeLinejoin="round"
+          />
+          <circle cx="17.5" cy="17.5" r="2.8" fill="#FFB3C1" stroke="#3A2D28" strokeWidth="1.8" />
+        </svg>
+      );
   }
 };
 

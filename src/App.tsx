@@ -81,6 +81,7 @@ import { ArchiveApp } from './components/apps/ArchiveApp';
 import { AchievementsApp } from './components/apps/AchievementsApp';
 import { BrowserApp } from './components/apps/BrowserApp';
 import { CatPetApp } from './components/apps/CatPetApp';
+import { DonateApp } from './components/apps/DonateApp';
 import { FilingApp } from './components/apps/FilingApp';
 import { ChatApp } from './components/apps/ChatApp';
 import { ClueBoardApp } from './components/apps/ClueBoardApp';
@@ -116,6 +117,7 @@ const DESKTOP_SHORTCUTS: DesktopShortcut[] = [  { id: 'sc_explorer', label: '我
   { id: 'sc_pet', label: '煤球的小屋', appId: 'pet' },
   { id: 'sc_music', label: '甜点八音盒', appId: 'music' },
   { id: 'sc_achievements', label: '成就徽章', appId: 'achievements' },
+  { id: 'sc_donate', label: '给小橘加个餐', appId: 'donate' },
 ];
 
 /**
@@ -139,6 +141,7 @@ const DEFAULT_WINDOW_SPECS: Record<AppId, { title: string; width: number; height
   relations: { title: '人物关系板', width: 800, height: 560 },
   archive: { title: '镇档案室', width: 740, height: 540 },
   filing: { title: '旧东西', width: 620, height: 540 },
+  donate: { title: '给小橘加个餐', width: 520, height: 540 },
 };
 
 function createInitialWindows(): WindowState[] {
@@ -1209,6 +1212,7 @@ export default function App() {
               onDiscoverClue={discoverClue}
             />
           ) : null}
+          {win.appId === 'donate' ? <DonateApp /> : null}
         </WindowFrame>
       ))}
 
