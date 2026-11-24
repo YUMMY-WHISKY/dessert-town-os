@@ -334,8 +334,14 @@ export const ALL_CHATS: ChatThread[] = [
           prompt: '行。你还想问什么？',
           choices: [
             {
-              label: '案发那天你在奶泡泡甜品铺待了多久？',
-              reply: '我约了波比谈授权。她说两点在店里等我，我 14:18 才到，前厅没人。',
+              label: '这两天店里生意怎么样？',
+              reply: '两桌客人。隔壁搞店庆，人都往那边挤。',
+              kind: 'casual',
+              next: 'b_business',
+            },
+            {
+              label: '案发那天你去奶泡泡甜品铺做什么？',
+              reply: '我约了波比谈授权。她说两点在店里等我。',
               kind: 'case',
               next: 'b_visit',
             },
@@ -348,10 +354,19 @@ export const ALL_CHATS: ChatThread[] = [
           ],
         },
         {
-          id: 'b_visit',
-          prompt: '（他别过脸）……不到四分钟，喊了两声没人应，我就走了。',
+          id: 'b_business',
+          prompt: '（他嗤笑一声）房租、货款、贷款，一样不落。',
           choices: [
-            { label: '你走的时候，柜台有什么不对吗？', reply: '没注意，她放我鸽子，我当时一肚子火。', kind: 'case', next: 'b_start' },
+            { label: '生意是越来越难做了。', reply: '可不是。隔壁一店庆，我这边就跟死了半截似的。', kind: 'casual', next: 'b_start' },
+            { label: '那你还在撑着？', reply: '不撑怎么办。这店开了十年了。', kind: 'casual', next: 'b_start' },
+          ],
+        },
+        {
+          id: 'b_visit',
+          prompt: '（他别过脸）我 14:18 才到，前厅一个人都没有，喊了两声也没人应。',
+          choices: [
+            { label: '你等了多久？', reply: '不到四分钟吧。她放我鸽子，我就走了。', kind: 'case', next: 'b_start' },
+            { label: '你走的时候，柜台有什么不对吗？', reply: '没注意，我当时一肚子火。', kind: 'case', next: 'b_start' },
             { label: '你空手出来的？', reply: '对。监控你们不是有吗？', kind: 'case', chapter: 4, next: 'b_start' },
           ],
         },
