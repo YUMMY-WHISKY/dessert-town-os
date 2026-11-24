@@ -72,7 +72,7 @@ export const ARCHIVE_DRAWERS: ArchiveDrawer[] = [
   {
     id: 'drawer_2006',
     year: '2006',
-    code: '2006-0715',
+    code: '2006-0716',
     headline: '2006 年 7 月 15 日 · 老街 7 号火灾',
     dateline: '甜点镇消防与市政联合存档 2006 年 7 月 16 日',
     stamp: '已归档',
@@ -104,7 +104,7 @@ export const ARCHIVE_DRAWERS: ArchiveDrawer[] = [
   {
     id: 'drawer_2014',
     year: '2014',
-    code: '2014-0715',
+    code: '2014-0820',
     headline: '2014 年 · 产权驳回与工艺名录',
     dateline: '甜点镇议会 2014 年 8 月 20 日',
     stamp: '程序合规',
