@@ -506,6 +506,62 @@ export const ALL_CHATS: ChatThread[] = [
       },
     ],
     fallbackReply: '（对方不在线。消息旁边显示一个小钟：定时发送。）',
+    dialogue: {
+      start: 'p_start',
+      nodes: [
+        {
+          id: 'p_start',
+          prompt: '（头像一直是灰的。发出去的消息，过很久才回。）',
+          choices: [
+            { label: '最近还好吗？', reply: '（隔了很久）……我很好。你别担心我。', kind: 'casual', next: 'p_start' },
+            { label: '蛋挞的方子还是老样子吗？', reply: '老样子。黄油要打发到发白，一步都不能省。', kind: 'casual', next: 'p_start' },
+            { label: '你小时候也这么早起吗？', reply: '我妈说，我一岁半就蹲在灶台边等蛋挞出炉。', kind: 'casual', next: 'p_start' },
+            {
+              label: '案发那天，你在店里吗？',
+              reply: '……你要问的，不是这个。',
+              kind: 'case',
+              next: 'p_store',
+            },
+            {
+              label: '配方到底是谁拿走的？',
+              reply: '没有人拿走。是我自己收起来的。',
+              kind: 'case',
+              next: 'p_recipe',
+            },
+            {
+              label: '2006 年那场火，和咕咕有关吗？',
+              reply: '……你查到那一步了。',
+              kind: 'case',
+              next: 'p_fire',
+            },
+          ],
+        },
+        {
+          id: 'p_store',
+          prompt: '（很久没有回复。消息下面显示：定时发送。）',
+          choices: [
+            { label: '为什么要做这一场局？', reply: '我要的不是配方，是一个所有人都看得见的答案。', kind: 'case', next: 'p_start' },
+            { label: '你知道这样会把自己也搭进去吗？', reply: '我知道。我算过。', kind: 'case', next: 'p_start' },
+          ],
+        },
+        {
+          id: 'p_recipe',
+          prompt: '那套配方从来就不是被偷的。是我把它藏进冷链箱，让它看起来像被带走。',
+          choices: [
+            { label: '所以你故意调走米露、加单去老街 7 号？', reply: '米露什么都不知道。她只是听话。', kind: 'case', next: 'p_start' },
+            { label: '为什么要让所有人以为配方丢了？', reply: '因为丢了才有人查。不丢，谁会在意老街 7 号。', kind: 'case', next: 'p_start' },
+          ],
+        },
+        {
+          id: 'p_fire',
+          prompt: '（输入框亮了很久，最后只有一行）2006 年那份验收单，是他签的字。',
+          choices: [
+            { label: '你有证据吗？', reply: '我攒了十年。都在旧东西里。', kind: 'case', next: 'p_start' },
+            { label: '你打算怎么办？', reply: '明天十点，发布会。我要他在所有人面前，念一遍那份验收单。', kind: 'case', next: 'p_start' },
+          ],
+        },
+      ],
+    },
   },
   {
     id: 'chat_gugu',
