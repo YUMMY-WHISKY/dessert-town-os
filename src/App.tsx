@@ -536,7 +536,7 @@ export default function App() {
                 ...t,
                 messages: [
                   ...t.messages,
-                  { id: `msg_${Date.now()}`, sender: 'me', text, time: '15:10', live: true },
+                  { id: `msg_${Date.now()}`, sender: 'me', text, time: '15:10' },
                 ],
               }
             : t
@@ -556,7 +556,6 @@ export default function App() {
                       sender: 'them',
                       text: thread.fallbackReply ?? '（对方没有回应）',
                       time: '15:11',
-                      live: true,
                     },
                   ],
                 }

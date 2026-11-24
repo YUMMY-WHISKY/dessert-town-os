@@ -114,8 +114,6 @@ export interface ChatMessage {
   text: string;
   time: string;
   chapter?: number;
-  /** 本次游戏中玩家主动问出来的消息（用于侦探账户只显示实时对话） */
-  live?: boolean;
   /** 这条回复里包含可收录的线索 */
   clueId?: string;
 }

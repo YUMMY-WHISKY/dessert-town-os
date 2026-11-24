@@ -14,16 +14,82 @@ export const ALL_CHATS: ChatThread[] = [
     unread: 0,
     clueId: 'clue_chat_alibi',
     chapter: 1,
-    messages: [],
+    messages: [
+      {
+        id: 'm0',
+        sender: 'me',
+        text: '米露，案发的时候你在哪？看到谁进店了吗？',
+        time: '14:50',
+        chapter: 1,
+      },
+      {
+        id: 'm1',
+        sender: 'them',
+        text: '探长大人！我 14:00 到 15:00 一直在后厨烤蛋挞，一步都没离开过！',
+        time: '14:52',
+        chapter: 1,
+      },
+      {
+        id: 'm1b',
+        sender: 'them',
+        text: '20 号是店庆，波比姐早上还说要放那套老歌单。结果一整天都没放。',
+        time: '14:52',
+        chapter: 1,
+      },
+      {
+        id: 'm2',
+        sender: 'me',
+        text: '别慌。你有没有看到什么可疑的人？',
+        time: '14:53',
+        chapter: 1,
+      },
+      {
+        id: 'm3',
+        sender: 'them',
+        text: '14:18 左右，[[黑猫咖啡馆的布莱克推门进来，问我波比姐在不在|clue_chat_alibi]]。我说在后厨，他就往柜台那边走了。我当时在烤蛋挞，没跟过去。',
+        time: '14:55',
+        chapter: 1,
+      },
+      {
+        id: 'm3b',
+        sender: 'them',
+        text: '还有……前厅那杯草莓牛奶不是我打翻的。我出来的时候它已经在地上滚了。',
+        time: '14:56',
+        chapter: 1,
+      },
+      {
+        id: 'm4',
+        sender: 'them',
+        text: '（16:50）探长……我今天想了一下午。波比姐让我去后门搬几个箱子，说烤箱还早。我以为怎么也得一个小时，结果刚搬一半烤箱就响了。我赶回去的时候已经 14:27 了。[[我是不是……不该离开后厨？|clue_milu_slip]]',
+        time: '16:50',
+        chapter: 2,
+      },
+      {
+        id: 'm5',
+        sender: 'them',
+        text: '（17:26）波比姐让我搬几个箱子，说是收拾仓库。她没让我问是什么。',
+        time: '17:26',
+        chapter: 4,
+      },
+      {
+        id: 'm6',
+        sender: 'them',
+        text: '（17:29）我把箱子搬到后门，是她自己接过去的。她那天戴了手套，我从没见她戴过。',
+        time: '17:29',
+        chapter: 4,
+      },
+    ],
     fallbackReply: '（米露回了一个发抖的表情）我、我真的只记得这些了……',
     dialogue: {
       start: 'd_start',
       nodes: [
         {
           id: 'd_start',
-          prompt: '（她看了看门口）……探长，你还想问什么？',
+          prompt: '（她看了看门口）……探长，你想聊点什么？',
           choices: [
-            { label: '20 号店庆忙坏了吧？', reply: '忙得脚不沾地。烤箱一炉接一炉，我都没停过。', kind: 'casual', next: 'd_start' },
+            { label: '这两天累不累？', reply: '还行，就是烤箱一炉接一炉，脚不沾地。', kind: 'casual', next: 'd_start' },
+            { label: '你住镇子哪边？', reply: '后街。走路过来十分钟，我每天都第一个到。', kind: 'casual', next: 'd_start' },
+            { label: '煤球平时听你的话吗？', reply: '只听鱼干的。谁手里有鱼干，它听谁的。', kind: 'casual', next: 'd_start' },
             {
               label: '案发那天有谁来过店里吗？',
               reply: '14:18 左右，布莱克从前厅进来了。',
@@ -94,15 +160,68 @@ export const ALL_CHATS: ChatThread[] = [
     avatarEmoji: '🐶',
     unread: 0,
     chapter: 1,
-    messages: [],
+    messages: [
+      {
+        id: 'c0',
+        sender: 'me',
+        text: '阿柴，案发的时候你在哪？',
+        time: '14:06',
+        chapter: 1,
+      },
+      {
+        id: 'c1',
+        sender: 'them',
+        text: '13:52 签收完冷链箱我就去镇南果园了，[[驿站 14:05 有打卡记录|clue_achai_clock]]，我可没时间作案。',
+        time: '14:08',
+        chapter: 1,
+      },
+      {
+        id: 'c1b',
+        sender: 'them',
+        text: '不过说真的，今天那个箱子特别沉，我搬的时候差点闪到腰。',
+        time: '14:09',
+        chapter: 1,
+      },
+      {
+        id: 'c2',
+        sender: 'them',
+        text: '（16:30）对了探长，前厅那个摄像头是我帮波比姐装的，我手机里还有当天截图的说明。',
+        time: '16:30',
+        chapter: 2,
+      },
+      {
+        id: 'c3',
+        sender: 'them',
+        text: '（16:33）我翻了下手机。14:21 那张截图里，布莱克手里是空的，连个袋子都没有。',
+        time: '16:33',
+        chapter: 2,
+      },
+      {
+        id: 'c3b',
+        sender: 'me',
+        text: '你那天那个冷链箱，后来送到哪了？',
+        time: '17:33',
+        chapter: 2,
+      },
+      {
+        id: 'c4',
+        sender: 'them',
+        text: '（17:34）老街 7 号那一单是她临时加的，[[运费给得比平时高两倍|clue_box_to_oldstreet]]，还让我别写进系统。那地方不是空了好多年吗？',
+        time: '17:34',
+        chapter: 2,
+      },
+    ],
     fallbackReply: '（阿柴发来一张驿站打卡截图）看吧，我人在镇南。',
     dialogue: {
       start: 'a_start',
       nodes: [
         {
           id: 'a_start',
-          prompt: '（他把手机夹在肩上）探长，你还想问哪件事？',
+          prompt: '（他把手机夹在肩上）探长，啥事？',
           choices: [
+            { label: '最近单子多吗？', reply: '多。镇南果园的芒果熟了，天天往镇上送。', kind: 'casual', next: 'a_start' },
+            { label: '这车一趟能装多少箱？', reply: '塞满二十箱。再多就得绑车顶了。', kind: 'casual', next: 'a_start' },
+            { label: '中午吃了吗？', reply: '路边啃了个馒头。这趟送完去蹭个蛋挞。', kind: 'casual', next: 'a_start' },
             {
               label: '案发那天你跑了几单？',
               reply: '十七单。镇南果园跑了两趟，驿站 14:05 有打卡。',
@@ -121,6 +240,7 @@ export const ALL_CHATS: ChatThread[] = [
               reply: '不多。案发那天倒有一单，送到老街 7 号。',
               clueId: 'clue_box_to_oldstreet',
               kind: 'case',
+              chapter: 2,
               next: 'a_box',
             },
           ],
@@ -174,14 +294,50 @@ export const ALL_CHATS: ChatThread[] = [
     avatarEmoji: '🐈‍⬛',
     unread: 0,
     chapter: 1,
-    messages: [],
+    messages: [
+      {
+        id: 'b1',
+        sender: 'them',
+        text: '哼，少血口喷人！我下午只是去谈授权，抽屉我碰都没碰。信不信我告你们诽谤！',
+        time: '14:26',
+        chapter: 1,
+      },
+      {
+        id: 'b1b',
+        sender: 'them',
+        text: '你们要真觉得是我，就去查账。我付的每一分钱都有记录，我不怕查。',
+        time: '14:27',
+        chapter: 1,
+      },
+      {
+        id: 'b_account',
+        sender: 'them',
+        text: '你要查就查，账号 [[heimao_black@nailong.com|clue_blake_account]]。',
+        time: '14:28',
+        chapter: 1,
+      },
+      {
+        id: 'b2',
+        sender: 'them',
+        text: '（17:10）……你们要是真想听，我可以讲。但我讲的你们不一定爱听。',
+        time: '17:10',
+        chapter: 4,
+      },
+      {
+        id: 'b2b',
+        sender: 'them',
+        text: '（17:12）那四分钟我只够走到柜台边，我连配方在哪都不知道，怎么偷？',
+        time: '17:12',
+        chapter: 4,
+      },
+    ],
     fallbackReply: '（布莱克已读不回）',
     dialogue: {
       start: 'b_start',
       nodes: [
         {
           id: 'b_start',
-          prompt: '行。你还想问什么？',
+          prompt: '有话就说。',
           choices: [
             {
               label: '这两天店里生意怎么样？',
@@ -189,6 +345,8 @@ export const ALL_CHATS: ChatThread[] = [
               kind: 'casual',
               next: 'b_business',
             },
+            { label: '这家店开几年了？', reply: '十年。开的时候这条街还没这么冷清。', kind: 'casual', next: 'b_start' },
+            { label: '豆子都自己烘？', reply: '自己烘。机器小，一次两公斤。', kind: 'casual', next: 'b_start' },
             {
               label: '案发那天你去奶泡泡甜品铺做什么？',
               reply: '我约了波比谈授权。她说两点在店里等我。',
@@ -238,7 +396,22 @@ export const ALL_CHATS: ChatThread[] = [
     avatarEmoji: '🕊️',
     unread: 0,
     chapter: 4,
-    messages: [],
+    messages: [
+      {
+        id: 'o1',
+        sender: 'them',
+        text: '（17:41）探长，听说你在档案室查一些很旧的东西。我建议你把精力放在能结案的地方。',
+        time: '17:41',
+        chapter: 4,
+      },
+      {
+        id: 'o2',
+        sender: 'them',
+        text: '（17:55）明天的发布会十点开始。稿子已经放在你桌上了，签个字就行。',
+        time: '17:55',
+        chapter: 4,
+      },
+    ],
     fallbackReply: '（咕咕没有回复。对话显示「对方正在输入」，持续了很久。）',
     dialogue: {
       start: 'g_start',
@@ -247,6 +420,9 @@ export const ALL_CHATS: ChatThread[] = [
           id: 'g_start',
           prompt: '探长，还有别的事吗？',
           choices: [
+            { label: '办公室平时都忙些什么？', reply: '文件、会、盖章，三样轮着来。', kind: 'casual', next: 'g_start' },
+            { label: '您在这儿干多少年了？', reply: '快三十年。镇上的事，我比谁都熟。', kind: 'casual', next: 'g_start' },
+            { label: '周末能歇口气吗？', reply: '歇不了。上面催得紧。', kind: 'casual', next: 'g_start' },
             {
               label: '案发那天办公室忙吗？',
               reply: '三份产权申请，一份改造对接。都在流程里。',
@@ -313,7 +489,22 @@ export const ALL_CHATS: ChatThread[] = [
     avatarEmoji: '🧁',
     unread: 0,
     chapter: 4,
-    messages: [],
+    messages: [
+      {
+        id: 'p1',
+        sender: 'them',
+        text: '（这条消息没有发送时间）小橘探长，如果你在翻这些，说明你已经比我想象的走得远了。',
+        time: '——',
+        chapter: 4,
+      },
+      {
+        id: 'p2',
+        sender: 'them',
+        text: '（这条消息没有发送时间）我没有想害任何人。我只是想讨回一个公道。',
+        time: '——',
+        chapter: 4,
+      },
+    ],
     fallbackReply: '（对方不在线。消息旁边显示一个小钟：定时发送。）',
   },
   {
