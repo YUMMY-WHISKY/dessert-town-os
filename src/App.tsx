@@ -283,14 +283,9 @@ export default function App() {
     );
   }, []);
 
-  /** 读过邮件（用于「叮咚！邮件被你看完啦」） */
+  /** 读过邮件 */
   const handleMarkEmailRead = useCallback((emailId: string) => {
     setEmails((prev) => prev.map((m) => (m.id === emailId ? { ...m, read: true } : m)));
-    setAchievements((prev) =>
-      prev.readEmails.includes(emailId)
-        ? prev
-        : { ...prev, readEmails: [...prev.readEmails, emailId] }
-    );
   }, []);
 
   /** 浏览过网页视图（用于「你咋这么八卦」） */

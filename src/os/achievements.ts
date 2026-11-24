@@ -14,43 +14,43 @@ export interface AchievementDef {
 }
 
 export const ACHIEVEMENT_CATEGORY_LABEL: Record<AchievementCategory, string> = {
-  story: '剧情推进',
+  story: '章节奖励',
   deduction: '推理玩法',
   discovery: '细心发现',
   choice: '选择',
 };
 
 export const ACHIEVEMENTS: AchievementDef[] = [
-  // 一、剧情推进
+  // 一、章节奖励
   {
-    id: 'story_closure',
+    id: 'story_ch1',
     category: 'story',
-    name: '恭喜结案',
-    description: '你按规矩做对了每一件事，结论却是错的',
+    name: '秘方失窃，先立个案',
+    description: '完成第 1 章「失窃的秘方」的结论，把这一章结案',
   },
   {
-    id: 'story_timeline',
+    id: 'story_ch2',
     category: 'story',
-    name: '时间管理大师来的吧',
-    description: '布莱克 14:21 就走了，抽屉 14:25 才开，中间这四分钟，时间线上只剩一个人',
+    name: '替罪羊？不存在的',
+    description: '完成第 2 章「替罪羊」的结论，把这一章结案',
   },
   {
-    id: 'story_notes',
+    id: 'story_ch3',
     category: 'story',
-    name: '一目十行',
-    description: '从 2006 到 2026，十六页笔记，你读完了',
+    name: '十二年，一页翻过去',
+    description: '完成第 3 章「她的十二年」的结论，把这一章结案',
   },
   {
-    id: 'story_procedure',
+    id: 'story_ch4',
     category: 'story',
-    name: 'how old are you？',
-    description: '没有一份文件违法，每一道手续上都是同一个人',
+    name: '火炎焱燚也烧不掉证据',
+    description: '完成第 4 章「火炎焱燚」的结论，把这一章结案',
   },
   {
-    id: 'story_finale',
+    id: 'story_ch5',
     category: 'story',
     name: '小橘探长赛高！！',
-    description: '达成一个结局',
+    description: '在第五章做出指控，达成结局 A 或 B',
   },
 
   // 二、推理玩法
@@ -63,14 +63,14 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'deduction_relations_types',
     category: 'deduction',
-    name: '哇塞！？莫非你是拼图大师',
+    name: '哇塞！？莫非你是推理大师',
     description: '互相冲突、证据对应、因果动机，你都用过了',
   },
   {
     id: 'deduction_ch1_cards',
     category: 'deduction',
     name: '老实交代！穷举了多少次？',
-    description: '完整时间线第一次提交就全对',
+    description: '把完整时间线拼对了',
   },
   {
     id: 'deduction_relations_six',
@@ -88,7 +88,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     id: 'deduction_music',
     category: 'deduction',
     name: '歌不错吧？。',
-    description: '不错不错',
+    description: '解锁了隐藏曲目',
   },
 
   // 三、细心发现
@@ -103,12 +103,6 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     category: 'discovery',
     name: '宁可错杀一千不可放过一个',
     description: '米露、阿柴、布莱克、咕咕，四个人的问话你都打开过了',
-  },
-  {
-    id: 'discovery_view_only',
-    category: 'discovery',
-    name: '叮咚！邮件被你看完啦',
-    description: '侦探账户里的关键邮件都读完了',
   },
   {
     id: 'discovery_margin_fund',
@@ -137,6 +131,12 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     category: 'choice',
     name: '站中间串两边',
     description: '你先签了结案稿，又回头重查了这个案子',
+  },
+  {
+    id: 'choice_ending_c',
+    category: 'choice',
+    name: '签个字，皆大欢喜',
+    description: '签下结案稿，用 C 结局收场',
   },
 
   // 六、推理玩法（一次性完成章节结论）
@@ -192,8 +192,6 @@ export interface AchievementProgress {
   endingsSeen: EndingId[];
   /** 打开过的聊天会话 */
   openedChats: string[];
-  /** 读过的邮件 id */
-  readEmails: string[];
   /** 浏览过的网页视图 */
   browserViews: string[];
   /** 时间线失败提交次数 */
@@ -211,7 +209,6 @@ export const EMPTY_ACHIEVEMENT_PROGRESS: AchievementProgress = {
   firstTry: {},
   endingsSeen: [],
   openedChats: [],
-  readEmails: [],
   browserViews: [],
   timelineAttempts: 0,
   timelineFirstTry: false,
@@ -235,7 +232,6 @@ export function loadAchievementProgress(): AchievementProgress {
         parsed.firstTry && typeof parsed.firstTry === 'object' ? parsed.firstTry : {},
       endingsSeen: Array.isArray(parsed.endingsSeen) ? parsed.endingsSeen : [],
       openedChats: Array.isArray(parsed.openedChats) ? parsed.openedChats : [],
-      readEmails: Array.isArray(parsed.readEmails) ? parsed.readEmails : [],
       browserViews: Array.isArray(parsed.browserViews) ? parsed.browserViews : [],
       timelineAttempts:
         typeof parsed.timelineAttempts === 'number' ? parsed.timelineAttempts : 0,
@@ -285,43 +281,29 @@ const CH1_PHOTO_CLUES = [
 /** 需要打开过的四个问话 */
 const CHAT_IDS = ['chat_milu', 'chat_achai', 'chat_black', 'chat_owl'];
 
-/** 侦探账户里的关键邮件 */
-const KEY_DETECTIVE_EMAILS = [
-  'mail_welcome',
-  'mail_achai_weight',
-  'mail_black_2',
-  'mail_police_cctv',
-  'mail_owl_warning',
-  'mail_yuning_archive',
-  'mail_gugu_pressure',
-  'mail_poppy_scheduled',
-  'mail_yuning_final',
-  'mail_black_last',
-];
-
 /** 论坛、搜索历史、议会公告 */
 const BROWSER_VIEWS = ['forum', 'history', 'council'];
 
 function isMet(id: string, ctx: AchievementContext): boolean {
   const { flags, discoveredClues, chapterAnswers, ending, totalClues, progress } = ctx;
   switch (id) {
-    case 'story_closure':
+    case 'story_ch1':
       return !!chapterAnswers[1];
-    case 'story_timeline':
-      return !!flags.timeline_ch2_solved;
-    case 'story_notes':
-      return !!flags.read_investigation_note;
-    case 'story_procedure':
-      return !!flags.procedure_chain_solved;
-    case 'story_finale':
-      return ending !== null;
+    case 'story_ch2':
+      return !!chapterAnswers[2];
+    case 'story_ch3':
+      return !!chapterAnswers[3];
+    case 'story_ch4':
+      return !!chapterAnswers[4];
+    case 'story_ch5':
+      return ending === 'A' || ending === 'B';
 
     case 'deduction_combine':
       return progress.combines >= 1;
     case 'deduction_relations_types':
       return ['conflict', 'trace', 'motive'].every((r) => progress.relations.includes(r));
     case 'deduction_ch1_cards':
-      return progress.timelineFirstTry;
+      return !!flags.timeline_ch2_solved;
     case 'deduction_relations_six':
       return discoveredClues.includes('clue_relations_solved');
     case 'deduction_archives':
@@ -333,8 +315,6 @@ function isMet(id: string, ctx: AchievementContext): boolean {
       return CH1_PHOTO_CLUES.every((id2) => discoveredClues.includes(id2));
     case 'discovery_poppy_phone':
       return CHAT_IDS.every((id2) => progress.openedChats.includes(id2));
-    case 'discovery_view_only':
-      return KEY_DETECTIVE_EMAILS.every((id2) => progress.readEmails.includes(id2));
     case 'discovery_margin_fund':
       return BROWSER_VIEWS.every((id2) => progress.browserViews.includes(id2));
 
@@ -352,6 +332,9 @@ function isMet(id: string, ctx: AchievementContext): boolean {
           .some((e) => e === 'A' || e === 'B')
       );
     }
+
+    case 'choice_ending_c':
+      return progress.endingsSeen.includes('C');
 
     case 'hidden_perfect':
       return (
