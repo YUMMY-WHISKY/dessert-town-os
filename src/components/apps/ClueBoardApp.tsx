@@ -473,7 +473,7 @@ const ClosureChoice: React.FC<{ locked: boolean; onSignClosure: () => void }> = 
           onClick={onSignClosure}
           className="cartoon-btn px-3 py-1.5 rounded-xl bg-[#FFE4E9] text-[11px] font-black text-[#3A2D28] disabled:opacity-40"
         >
-          签字结案（结局 C · 签结案稿）
+          签字结案
         </button>
         <button
           type="button"
