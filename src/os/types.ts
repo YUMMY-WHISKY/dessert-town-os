@@ -15,8 +15,7 @@ export type AppId =
   | 'radio'
   | 'relations'
   | 'archive'
-  | 'filing'
-  | 'donate';
+  | 'filing';
 
 export type FSNodeType = 'folder' | 'text' | 'image';
 
