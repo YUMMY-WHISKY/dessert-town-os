@@ -36,7 +36,7 @@ export const CH1_CLUES: ClueItem[] = [
     id: 'clue_box_code',
     title: '铜锁上的开业纪念日',
     sourceApp: '图画看图 · 神秘木盒',
-    summary: '铜锁底部刻着「开业纪念日 0715」。',
+    summary: '铜锁底部刻着「开业纪念日 0715」——那天也是七岁波比的生日。',
     hint: '把《神秘木盒》放大到 150% 以上，再仔细看铜锁。',
     chapter: 1,
     tier: 'observe',
