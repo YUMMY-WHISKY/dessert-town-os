@@ -178,7 +178,7 @@ export const CH1_NODES: FSNode[] = [
     parentId: ROOT_IDS.DESKTOP,
     sizeLabel: '0.6 KB',
     modifiedAt: '2026-11-19 23:11',
-    chapter: 1,
+    chapter: 3,
     content: [
       '明天店庆，歌单还是老样子：',
       '先放 1 号《午后甜点店》，再放 3 号《草莓圆舞曲》，',

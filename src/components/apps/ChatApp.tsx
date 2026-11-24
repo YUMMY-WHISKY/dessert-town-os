@@ -273,7 +273,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({
 
             <div className="flex-1 min-h-0 p-4 overflow-y-auto cartoon-scroll space-y-3 bg-[#FFFDF7]">
               {activeThread.messages
-                .filter((msg) => !isDetective || msg.live)
+                .filter((msg) => (!isDetective || msg.live) && (!msg.chapter || msg.chapter <= chapter))
                 .map((msg) => {
                   const isMe = msg.sender === 'me';
                   return (

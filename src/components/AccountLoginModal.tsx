@@ -105,12 +105,7 @@ export const AccountLoginModal: React.FC<AccountLoginModalProps> = ({
 
         {error ? (
           <p className="text-[11px] font-bold text-[#DC2626] mb-2">账号或密码不对。</p>
-        ) : (
-          <div className="text-[10px] text-[#A99A8C] mb-2 space-y-0.5">
-            <p>波比：账号在桌面「账号备忘」，密码是名字拼音 + 生日。</p>
-            <p>布莱克：账号在汪汪聊天里直接问他要；密码生日去 PawNet 搜他的博客。</p>
-          </div>
-        )}
+        ) : null}
 
         <button
           type="submit"

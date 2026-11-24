@@ -6,7 +6,6 @@ import {
   AchievementCategory,
   AchievementDef,
   AchievementProgress,
-  VISIBLE_ACHIEVEMENTS,
 } from '../../os/achievements';
 
 interface AchievementsAppProps {
@@ -25,7 +24,6 @@ const CATEGORY_COLOR: Record<AchievementCategory, string> = {
   deduction: '#DBEAFE',
   discovery: '#FEF3C7',
   choice: '#D1FAE5',
-  hidden: '#FFE4E9',
 };
 
 const AchievementCard: React.FC<{
@@ -55,11 +53,9 @@ const AchievementCard: React.FC<{
       >
         {def.name}
       </p>
-      {unlocked ? (
-        <p className="text-[10px] font-bold text-[#8B7A6B] leading-snug mt-0.5">
-          {def.description}
-        </p>
-      ) : null}
+      <p className="text-[10px] font-bold text-[#8B7A6B] leading-snug mt-0.5">
+        {def.description}
+      </p>
     </div>
     {unlocked ? (
       <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0 ml-auto" />
@@ -93,7 +89,7 @@ export const AchievementsApp: React.FC<AchievementsAppProps> = ({ progress }) =>
 
       <div className="flex-1 min-h-0 overflow-y-auto cartoon-scroll p-3 space-y-4">
         {CATEGORY_ORDER.map((category) => {
-          const items = VISIBLE_ACHIEVEMENTS.filter((a) => a.category === category);
+          const items = ACHIEVEMENTS.filter((a) => a.category === category);
           if (items.length === 0) return null;
           const done = items.filter((a) => unlocked.has(a.id)).length;
           return (

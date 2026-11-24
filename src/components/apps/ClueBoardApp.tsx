@@ -112,10 +112,9 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
     });
   }, [chapters, clues, discoveredClues]);
 
-  /** 线索按章节分组，只展示已经解锁的章节 */
+  /** 线索按章节分组，全部章节都展示 */
   const chapterGroups = useMemo(() => {
     return chapterStats
-      .filter((stat) => stat.id <= caseState.chapter)
       .map((stat) => {
         const items = clues
           .filter((c) => c.chapter === stat.id)
@@ -123,7 +122,7 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
         return { ...stat, items };
       })
       .filter((g) => g.items.length > 0);
-  }, [chapterStats, clues, caseState.chapter]);
+  }, [chapterStats, clues]);
 
   const handleToggleClue = (clueId: string) => {
     setComboMsg(null);
@@ -154,7 +153,6 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
       {/* 章节条：已解锁的都可以点回去看 */}
       <div className="px-3 py-2 bg-[#FFF8EB] border-b-2 border-[#3A2D28] flex items-center gap-1.5 overflow-x-auto cartoon-scroll">
         {chapters.map((ch) => {
-          const unlocked = ch.id <= caseState.chapter;
           const done = caseState.chapter > ch.id || !!caseState.chapterAnswers[ch.id];
           const active = ch.id === viewChapter;
           const stat = chapterStats.find((s) => s.id === ch.id);
@@ -162,29 +160,23 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
             <button
               key={ch.id}
               type="button"
-              disabled={!unlocked}
-              title={unlocked ? undefined : '这一章还没有解锁'}
               onClick={() => {
-                if (!unlocked) return;
                 setViewChapter(ch.id);
                 setSelected([]);
                 setComboMsg(null);
                 setTab('clues');
               }}
               className={`shrink-0 px-2.5 py-1 rounded-lg border-2 text-[11px] font-black flex items-center gap-1 transition-colors ${
-                !unlocked
-                  ? 'bg-[#E9E1D6] border-[#D8CBB8] text-[#A99A8C] cursor-not-allowed'
-                  : active
-                    ? 'bg-[#FFB830] border-[#3A2D28] text-[#3A2D28]'
-                    : done
-                      ? 'bg-[#A7F3D0] border-[#3A2D28] text-[#3A2D28] hover:brightness-[0.98]'
-                      : 'bg-[#FFFDF7] border-[#3A2D28] text-[#3A2D28] hover:bg-[#FEF3C7]'
+                active
+                  ? 'bg-[#FFB830] border-[#3A2D28] text-[#3A2D28]'
+                  : done
+                    ? 'bg-[#A7F3D0] border-[#3A2D28] text-[#3A2D28] hover:brightness-[0.98]'
+                    : 'bg-[#FFFDF7] border-[#3A2D28] text-[#3A2D28] hover:bg-[#FEF3C7]'
               }`}
             >
-              {!unlocked ? <Lock className="w-3 h-3" /> : null}
               <span>第{ch.id}章</span>
               <span className="tabular-nums text-[10px] px-1 rounded bg-[#FFFDF7]/70">
-                {unlocked ? `${stat?.found ?? 0}/${stat?.total ?? 0}` : '—'}
+                {stat?.found ?? 0}/{stat?.total ?? 0}
               </span>
               {active && isReview ? (
                 <span className="text-[9px] font-bold opacity-70">回顾</span>

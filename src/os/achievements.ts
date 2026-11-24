@@ -4,15 +4,13 @@ export type AchievementCategory =
   | 'story'
   | 'deduction'
   | 'discovery'
-  | 'choice'
-  | 'hidden';
+  | 'choice';
 
 export interface AchievementDef {
   id: string;
   category: AchievementCategory;
   name: string;
   description: string;
-  hidden?: boolean;
 }
 
 export const ACHIEVEMENT_CATEGORY_LABEL: Record<AchievementCategory, string> = {
@@ -20,7 +18,6 @@ export const ACHIEVEMENT_CATEGORY_LABEL: Record<AchievementCategory, string> = {
   deduction: '推理玩法',
   discovery: '细心发现',
   choice: '选择',
-  hidden: '隐藏成就',
 };
 
 export const ACHIEVEMENTS: AchievementDef[] = [
@@ -142,53 +139,46 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '你先签了结案稿，又回头重查了这个案子',
   },
 
-  // 隐藏成就
-  {
-    id: 'hidden_perfect',
-    category: 'hidden',
-    name: '一点细节都不放过啊你',
-    description: '没用提示，找齐所有线索，用 A、B 两个结局结案，而且从没触发过 C 结局',
-    hidden: true,
-  },
+  // 六、推理玩法（一次性完成章节结论）
   {
     id: 'hidden_ch1_first_try',
-    category: 'hidden',
+    category: 'deduction',
     name: '一一得一',
     description: '第一章所有结论题目一次答对',
-    hidden: true,
   },
   {
     id: 'hidden_ch2_first_try',
-    category: 'hidden',
+    category: 'deduction',
     name: '二二得四',
     description: '第二章所有结论题目一次答对',
-    hidden: true,
   },
   {
     id: 'hidden_ch3_first_try',
-    category: 'hidden',
+    category: 'deduction',
     name: '三三得九',
     description: '第三章所有结论题目一次答对',
-    hidden: true,
   },
   {
     id: 'hidden_ch4_first_try',
-    category: 'hidden',
+    category: 'deduction',
     name: '四四十六',
     description: '第四章所有结论题目一次答对',
-    hidden: true,
   },
   {
+    id: 'hidden_perfect',
+    category: 'choice',
+    name: '一点细节都不放过啊你',
+    description: '没用提示，找齐所有线索，用 A、B 两个结局结案，而且从没触发过 C 结局',
+  },
+
+  // 七、细心发现
+  {
     id: 'hidden_feed3',
-    category: 'hidden',
+    category: 'discovery',
     name: '煤球投喂官',
     description: '你投喂了煤球三次，它开始跟你说更多的话',
-    hidden: true,
   },
 ];
-
-export const VISIBLE_ACHIEVEMENTS = ACHIEVEMENTS.filter((a) => !a.hidden);
-export const HIDDEN_ACHIEVEMENTS = ACHIEVEMENTS.filter((a) => a.hidden);
 
 export interface AchievementProgress {
   unlocked: string[];

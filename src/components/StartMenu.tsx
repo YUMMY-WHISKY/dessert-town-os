@@ -43,7 +43,7 @@ const APP_LIST: { appId: AppId; name: string; desc: string }[] = [
   { appId: 'notepad', name: '记事本', desc: '阅读与记录探案笔记' },
   { appId: 'music', name: '甜点八音盒', desc: '按顺序播放解锁隐藏曲目' },
   { appId: 'clueboard', name: '破案手账', desc: '线索拼合、章节结论与终局' },
-  { appId: 'achievements', name: '成就徽章', desc: '查看已解锁的成就与隐藏成就' },
+  { appId: 'achievements', name: '成就徽章', desc: '查看已解锁的成就' },
 ];
 
 export const StartMenu: React.FC<StartMenuProps> = ({
