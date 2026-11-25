@@ -136,7 +136,7 @@ export const ALL_CHATS: ChatThread[] = [
           prompt: '（阿柴发来一张驿站打卡截图）看吧，我人在镇南。',
           choices: [
             { label: '箱子里装的是什么？', reply: '不知道啊，封得好好的。我就是个送货的。', kind: 'case', next: 'a_start' },
-            { label: '你送到哪了？', reply: '送到老街 7 号门口。波比姐让我放下就走。', kind: 'case', next: 'a_start' },
+            { label: '你送到哪了？', reply: '送到老街 7 号门口。波比姐让我放下就走。', kind: 'case', chapter: 2, next: 'a_start' },
           ],
         },
         {

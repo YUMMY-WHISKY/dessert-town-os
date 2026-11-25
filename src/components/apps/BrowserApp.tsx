@@ -26,6 +26,8 @@ interface BrowserAppProps {
 interface ForumReply {
   author: string;
   text: string;
+  /** 低于该章节不显示这条回复 */
+  minChapter?: number;
 }
 
 interface ForumPost {
@@ -91,7 +93,7 @@ const POSTS: ForumPost[] = [
       { author: '回复一', text: '听说这次要统一供应链，小商户活不下去。' },
       { author: '回复二', text: '经办人还是镇长办公室那个秘书，手续挑不出错。' },
       { author: '回复三', text: '挑不出错，不代表没问题。' },
-      { author: '匿名', text: '06年那次也闹过迁离，老街七家签了联名信，后来不了了之。听说签得最坚决的那家，当年出了意外。' },
+      { author: '匿名', text: '06年那次也闹过迁离，老街七家签了联名信，后来不了了之。听说签得最坚决的那家，当年出了意外。', minChapter: 4 },
     ],
   },
   {
@@ -167,6 +169,8 @@ interface PersonSite {
   url: string;
   summary: string;
   paragraphs: string[];
+  /** 低于该章节不出现在居民主页里 */
+  minChapter?: number;
 }
 
 interface TownPerson {
@@ -199,10 +203,9 @@ const TOWN_PEOPLE: TownPerson[] = [
         id: 'site_poppy_menu',
         title: '奶泡泡甜品铺 · 店庆菜单',
         url: 'paw://sweet.house/menu',
-        summary: '店庆供应、店庆歌单与营业时间。',
+        summary: '店庆供应与营业时间。',
         paragraphs: [
           '店庆供应：黄金流心蛋挞（限量）、草莓牛奶、黑糖司康、蛋挞。',
-          '店庆歌单：1-3-1-2。顺序错了就不成调子了。',
           '营业时间：08:00–18:00。',
           '外卖只接镇内，冷链箱另加 5 甜心币。',
         ],
@@ -215,7 +218,7 @@ const TOWN_PEOPLE: TownPerson[] = [
         paragraphs: [
           '妈站在柜台后面，围裙上全是面粉。',
           '我坐在柜台上，手里举着一块木牌，上面写着「波比的店」。',
-          '相册最后一页夹着一张旧报纸剪角，日期是 2006 年 6 月。',
+          '相册最后一页夹着一张旧报纸的一角，日期已经模糊看不清了。',
         ],
       },
       {
@@ -295,6 +298,7 @@ const TOWN_PEOPLE: TownPerson[] = [
         title: '米露的实习周记',
         url: 'paw://milu.memo/blog',
         summary: '烤箱、蛋挞和一点点害怕。',
+        minChapter: 2,
         paragraphs: [
           '11.21　今天又被烤箱烫到了。波比姐让我去后门搬箱子，说烤箱还早。结果刚搬一半就响了。',
           '11.20　店庆当天，前厅挤得转不过身，蛋挞差点没出炉。',
@@ -336,6 +340,7 @@ const TOWN_PEOPLE: TownPerson[] = [
         title: '阿柴的今日路线',
         url: 'paw://achai.delivery/route',
         summary: '一张手写的送货顺序表。',
+        minChapter: 2,
         paragraphs: [
           '08:30 镇南果园 → 09:10 奶泡泡甜品铺 → 10:00 黑猫咖啡馆。',
           '13:52 奶泡泡甜品铺冷链箱签收。',
@@ -356,6 +361,7 @@ const TOWN_PEOPLE: TownPerson[] = [
         title: '咕咕的工作笔记',
         url: 'paw://office.town/gugu',
         summary: '一份过于整洁的公开工作记录。',
+        minChapter: 3,
         paragraphs: [
           '11.21　今天处理了三份产权申请，都按流程办。',
           '老街片区的材料要统一归档，旧事不要影响街区申报。',
@@ -367,6 +373,7 @@ const TOWN_PEOPLE: TownPerson[] = [
         title: '镇长办公室 · 本周日程',
         url: 'paw://office.town/week',
         summary: '产权复核、改造对接与结案发布会。',
+        minChapter: 4,
         paragraphs: [
           '周一：产权复核。',
           '周三：街区改造对接。',
@@ -379,6 +386,7 @@ const TOWN_PEOPLE: TownPerson[] = [
         title: '镇长办公室 · 公开接待日',
         url: 'paw://office.town/reception',
         summary: '本周接待安排与材料要求。',
+        minChapter: 3,
         paragraphs: [
           '接待时间：周二、周四 14:00–16:00。',
           '产权类材料请提前三个工作日提交，逾期顺延。',
@@ -768,7 +776,9 @@ export const BrowserApp: React.FC<BrowserAppProps> = ({ chapter, onView }) => {
                       </span>
                     </p>
                     <div className="mt-2 space-y-1.5">
-                      {person.sites.map((site) => (
+                      {person.sites
+                        .filter((site) => (site.minChapter ?? 1) <= chapter)
+                        .map((site) => (
                         <button
                           key={site.id}
                           type="button"
@@ -952,7 +962,9 @@ export const BrowserApp: React.FC<BrowserAppProps> = ({ chapter, onView }) => {
                   </div>
 
                   <div className="mt-3 pt-3 border-t-2 border-dashed border-[#D8CBB8] space-y-2">
-                    {currentPost.replies.map((r, i) => (
+                    {currentPost.replies
+                      .filter((r) => (r.minChapter ?? 1) <= chapter)
+                      .map((r, i) => (
                       <div key={i} className="p-2 rounded-lg bg-[#FFFDF7] border border-[#E5D8C5]">
                         <p className="text-[10px] font-black text-[#6E5A52] mb-0.5">{r.author}</p>
                         <p className="text-[11px] text-[#4A3A32] leading-5">

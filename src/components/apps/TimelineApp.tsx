@@ -63,7 +63,9 @@ export const TimelineApp: React.FC<TimelineAppProps> = ({
   const placeCard = (card: TimelineCard, minute: number) => {
     if (submitted) return;
     soundEngine.playClick();
-    onPlacementsChange({ ...placements, [card.id]: clampMinute(minute) });
+    // 区间卡吸附到真实起点：否则左边界会跟着点击位置跑，整条卡飞出轨道
+    const target = card.kind === 'span' ? card.start : minute;
+    onPlacementsChange({ ...placements, [card.id]: clampMinute(target) });
     setJudged(null);
   };
 

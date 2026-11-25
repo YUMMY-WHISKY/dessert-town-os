@@ -144,7 +144,7 @@ const DEFAULT_WINDOW_SPECS: Record<AppId, { title: string; width: number; height
   achievements: { title: '成就徽章', width: 680, height: 540 },
   browser: { title: 'PawNet 浏览器', width: 760, height: 520 },
   pet: { title: '煤球的小屋', width: 480, height: 440 },
-  timeline: { title: '时间线白板', width: 840, height: 540 },
+  timeline: { title: '时间线白板', width: 920, height: 540 },
   radio: { title: '甜点镇广播', width: 480, height: 440 },
   relations: { title: '人物关系板', width: 800, height: 560 },
   archive: { title: '镇档案室', width: 740, height: 540 },
@@ -920,8 +920,43 @@ export default function App() {
       );
 
       if (chapterId < 5) {
-        const nextDef = CHAPTERS.find((c) => c.id === nextChapter);
-        showToast(`第 ${nextChapter} 章 · ${nextDef?.title ?? ''} 已解锁`);
+        const openings: Record<number, string> = {
+          2: '聊天、邮件和浏览器都冒出了新说法',
+          3: '桌面多了波比的便利贴，镇档案室开放调阅',
+          4: '浏览器和论坛翻出了旧闻',
+        };
+        const msg = openings[nextChapter];
+        if (msg) {
+          showToast(msg);
+          // 同时发一封系统邮件存档，避免玩家错过 3.6 秒的顶部提示
+          const mailId = `mail_system_ch${nextChapter}`;
+          const subjects: Record<number, string> = {
+            2: '新的说法',
+            3: '新的线索来源',
+            4: '旧闻',
+          };
+          setEmails((prev) =>
+            prev.some((m) => m.id === mailId)
+              ? prev
+              : [
+                  ...prev,
+                  {
+                    id: mailId,
+                    from: '小橘侦探社 · 系统',
+                    fromRole: '自动通知',
+                    to: '小橘探长',
+                    subject: subjects[nextChapter] ?? '更新',
+                    timestamp: '刚刚',
+                    folder: 'inbox',
+                    read: false,
+                    starred: false,
+                    chapter: nextChapter,
+                    account: 'detective',
+                    body: ['探长：', '', `${msg}。`, '', '记得回去翻一遍。'].join('\n'),
+                  },
+                ]
+          );
+        }
       }
       return { ok: true, feedback: def.conclusion.successText, advanced: true };
     },
@@ -1363,7 +1398,7 @@ export default function App() {
             <ArchiveApp
               drawers={archiveDrawers}
               discoveredClues={discoveredClues}
-              locked={false}
+              locked={contentChapter < 3}
               onDiscoverClue={discoverClue}
               onFlag={handleFlag}
             />

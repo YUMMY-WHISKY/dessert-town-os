@@ -104,27 +104,29 @@ export const MusicBoxApp: React.FC<MusicBoxAppProps> = ({
           );
         })}
 
-        {/* 第四首 */}
-        <button
-          type="button"
-          disabled={!unlocked}
-          onClick={() => {
-            if (!unlocked) return;
-            soundEngine.playClick();
-            setShowSheet(true);
-          }}
-          className={`w-full px-2.5 py-1.5 rounded-xl border-2 text-left flex items-center justify-between text-[11px] font-bold transition-colors ${
-            unlocked
-              ? 'bg-[#FDE68A] border-[#3A2D28] text-[#3A2D28] hover:bg-[#FCD34D]'
-              : 'bg-[#F6EFE2] border-dashed border-[#D8CBB8] text-[#A99A8C]'
-          }`}
-        >
-          <span className="flex items-center gap-1.5">
-            {unlocked ? <Sparkles className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-            <span>04. 店庆夜</span>
-          </span>
-          <span>{unlocked ? '未公开曲目' : '顺序不对，播不出来'}</span>
-        </button>
+        {/* 第四首：第三章之前完全不出现，玩家怎么点都看不到任何谜题提示 */}
+        {chapter >= 3 ? (
+          <button
+            type="button"
+            disabled={!unlocked}
+            onClick={() => {
+              if (!unlocked) return;
+              soundEngine.playClick();
+              setShowSheet(true);
+            }}
+            className={`w-full px-2.5 py-1.5 rounded-xl border-2 text-left flex items-center justify-between text-[11px] font-bold transition-colors ${
+              unlocked
+                ? 'bg-[#FDE68A] border-[#3A2D28] text-[#3A2D28] hover:bg-[#FCD34D]'
+                : 'bg-[#F6EFE2] border-dashed border-[#D8CBB8] text-[#A99A8C]'
+            }`}
+          >
+            <span className="flex items-center gap-1.5">
+              {unlocked ? <Sparkles className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+              <span>04. 店庆夜</span>
+            </span>
+            <span>{unlocked ? '未公开曲目' : '顺序不对，播不出来'}</span>
+          </button>
+        ) : null}
         </div>
 
       {/* 乐谱残页 */}
