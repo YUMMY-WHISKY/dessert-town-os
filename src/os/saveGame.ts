@@ -12,6 +12,8 @@ interface FullCloudPayload {
   achievements: AchievementProgress;
   /** 自动会话快照：刷新 / 切后台被重载时用来恢复现场 */
   session?: SessionSnapshot | null;
+  /** 一次性标记（如尤宁邮件 toast 是否弹过） */
+  flags?: Record<string, boolean>;
 }
 
 export interface SaveData {
@@ -58,6 +60,7 @@ function emptyPayload(): FullCloudPayload {
     saves: Array.from({ length: SAVE_SLOT_COUNT }, () => null),
     achievements: { ...EMPTY_ACHIEVEMENT_PROGRESS },
     session: null,
+    flags: {},
   };
 }
 
@@ -132,6 +135,7 @@ function normalizePayload(raw: unknown): FullCloudPayload | null {
       ...(r.achievements ?? {}),
     },
     session: normalizeSession(r.session),
+    flags: r.flags && typeof r.flags === 'object' ? { ...r.flags } : {},
   };
 }
 
@@ -234,4 +238,22 @@ export function clearLocalSessionSnapshot(): void {
   } catch {
     // ignore
   }
+}
+
+// ---- flags（一次性标记） ----
+
+export async function getFlag(key: string): Promise<boolean> {
+  return withSaveLock(async () => {
+    const p = await loadPayload();
+    return !!(p.flags && p.flags[key]);
+  });
+}
+
+export async function setFlag(key: string, value: boolean): Promise<void> {
+  await withSaveLock(async () => {
+    const p = await loadPayload();
+    p.flags = p.flags ?? {};
+    p.flags[key] = value;
+    await savePayload(p);
+  });
 }
