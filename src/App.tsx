@@ -23,6 +23,7 @@ import {
   INITIAL_CLUES,
   INITIAL_EMAILS,
   INITIAL_FS_NODES,
+  mergeSeedChats,
   RADIO_CHANNELS,
   RELATION_EDGES,
   RELATION_NODES,
@@ -256,7 +257,7 @@ export default function App() {
       if (session && phaseRef.current === 'title') {
         setFsNodes(hydrateImageUrls(session.fsNodes));
         setEmails(session.emails);
-        setChats(session.chats);
+        setChats(mergeSeedChats(session.chats));
         setCaseState(session.caseState);
         setTimelinePlacements(session.timelinePlacements);
         setDiscoveredClues(session.discoveredClues);
@@ -646,6 +647,10 @@ export default function App() {
     setWindows((prev) => prev.map((w) => (w.id === winId ? { ...w, x, y } : w)));
   }, []);
 
+  const handleResizeWindow = useCallback((winId: string, width: number, height: number) => {
+    setWindows((prev) => prev.map((w) => (w.id === winId ? { ...w, width, height } : w)));
+  }, []);
+
   const handleTaskbarSelectWindow = useCallback(
     (winId: string) => {
       const target = windows.find((w) => w.id === winId);
@@ -823,7 +828,7 @@ export default function App() {
       setMusicPlaying(false);
       setFsNodes(hydrateImageUrls(data.fsNodes));
       setEmails(data.emails);
-      setChats(data.chats);
+      setChats(mergeSeedChats(data.chats));
       setCaseState(data.caseState);
       setTimelinePlacements(data.timelinePlacements);
       setDiscoveredClues(data.discoveredClues);
@@ -1148,6 +1153,7 @@ export default function App() {
           onMinimize={handleMinimizeWindow}
           onToggleMaximize={handleToggleMaximize}
           onMove={handleMoveWindow}
+          onResize={handleResizeWindow}
         >
           {win.appId === 'explorer' ? (
             <FileExplorerApp

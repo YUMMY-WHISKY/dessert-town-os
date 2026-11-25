@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Send, UserRound } from 'lucide-react';
 import { ChatChoice, ChatThread } from '../../os/types';
 import { RichText } from '../RichText';
@@ -62,9 +62,15 @@ export const ChatApp: React.FC<ChatAppProps> = ({
   const [selectedId, setSelectedId] = useState(threads[0]?.id ?? '');
   const [replyText, setReplyText] = useState('');
   const [dialogues, setDialogues] = useState<Record<string, DialogueState>>({});
+  const [typing, setTyping] = useState<TypingState | null>(null);
   const [account, setAccount] = useState<'detective' | 'poppy' | 'black'>('detective');
   const [loginOpen, setLoginOpen] = useState(false);
-  const [typing, setTyping] = useState<TypingState | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // 对方回完话 / 切换会话后自动滚到底
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [typing, selectedId, account]);
 
   const accountThreads = threads.filter(
     (t) => (t.account ?? 'detective') === account
@@ -274,7 +280,8 @@ export const ChatApp: React.FC<ChatAppProps> = ({
 
             <div className="flex-1 min-h-0 p-4 overflow-y-auto cartoon-scroll space-y-3 bg-[#FFFDF7]">
               {activeThread.messages
-                .filter((msg) => !msg.chapter || msg.chapter <= chapter)
+                // 侦探模式按章节渐进解锁；用密码登录他人账户时显示全部（玩家主动偷看）
+                .filter((msg) => account !== 'detective' || !msg.chapter || msg.chapter <= chapter)
                 .map((msg) => {
                   const isMe = msg.sender === 'me';
                   return (
@@ -354,17 +361,18 @@ export const ChatApp: React.FC<ChatAppProps> = ({
                   这段问话结束了。你可以继续用下面的输入框提问。
                 </p>
               ) : null}
+              <div ref={bottomRef} />
             </div>
 
             {isTyping ? null : isDetective && currentNode && availableChoices.length > 0 ? (
-              <div className="p-2.5 bg-[#F6EFE2] border-t-2 border-[#3A2D28]">
-                <div className="flex flex-col gap-2">
+              <div className="p-1.5 bg-[#F6EFE2] border-t-2 border-[#3A2D28]">
+                <div className="flex flex-col gap-1">
                   {availableChoices.map((choice, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => handleChoice(choice)}
-                      className="cartoon-btn w-full text-left px-3 py-2 rounded-xl bg-[#FFFDF7] border-2 border-[#3A2D28] text-xs font-bold text-[#3A2D28] hover:bg-[#FEF3C7]"
+                      className="cartoon-btn w-full text-left px-2 py-1 rounded-lg bg-[#FFFDF7] border-2 border-[#3A2D28] text-[11px] font-bold text-[#3A2D28] hover:bg-[#FEF3C7] leading-snug"
                     >
                       {choice.label}
                     </button>
@@ -436,6 +444,10 @@ export const ChatApp: React.FC<ChatAppProps> = ({
         onClose={() => setLoginOpen(false)}
         onSuccess={(next) => {
           setAccount(next);
+          setLoginOpen(false);
+        }}
+        onSwitchDetective={() => {
+          setAccount('detective');
           setLoginOpen(false);
         }}
       />

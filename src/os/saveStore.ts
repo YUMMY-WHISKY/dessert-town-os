@@ -1,6 +1,6 @@
 /**
  * 云存档通用层：把任意 JSON blob 读写到 lumimaker-sdk。
- * SDK 本地开发自动 fallback 到内存存储（不走 localStorage），发布到平台自动走云。
+ * SDK 本地开发自动 fallback 到内存存储，发布到平台自动走云。
  * 上层模块自己决定 blob 里放什么。
  */
 import { sdk } from '@66rpg/lumimaker-sdk';

@@ -3,6 +3,9 @@ import { Minus, Square, X, Maximize2 } from 'lucide-react';
 import { WindowState } from '../os/types';
 import { AppIcon } from './CartoonIcons';
 
+const MIN_W = 280;
+const MIN_H = 200;
+
 interface WindowFrameProps {
   win: WindowState;
   isActive: boolean;
@@ -11,6 +14,7 @@ interface WindowFrameProps {
   onMinimize: (id: string) => void;
   onToggleMaximize: (id: string) => void;
   onMove: (id: string, x: number, y: number) => void;
+  onResize: (id: string, width: number, height: number) => void;
   children: React.ReactNode;
 }
 
@@ -22,6 +26,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   onMinimize,
   onToggleMaximize,
   onMove,
+  onResize,
   children,
 }) => {
   const dragState = useRef<{
@@ -30,7 +35,14 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     origX: number;
     origY: number;
   } | null>(null);
+  const resizeState = useRef<{
+    startX: number;
+    startY: number;
+    origW: number;
+    origH: number;
+  } | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [resizing, setResizing] = useState(false);
   // 最小化 / 关闭都只隐藏不卸载，重新打开时应用内部状态还在
   const hidden = win.minimized || !!win.closed;
 
@@ -61,6 +73,44 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     if (!dragState.current) return;
     dragState.current = null;
     setDragging(false);
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
+
+  // ---- resize 手柄 ----
+  const handlePointerDownResize = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (win.maximized) return;
+    onFocus(win.id);
+    resizeState.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      origW: win.width,
+      origH: win.height,
+    };
+    setResizing(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMoveResize = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!resizeState.current) return;
+    const dx = e.clientX - resizeState.current.startX;
+    const dy = e.clientY - resizeState.current.startY;
+    const nextW = Math.min(
+      Math.max(MIN_W, resizeState.current.origW + dx),
+      window.innerWidth - 16
+    );
+    const nextH = Math.min(
+      Math.max(MIN_H, resizeState.current.origH + dy),
+      window.innerHeight - 76
+    );
+    onResize(win.id, nextW, nextH);
+  };
+
+  const handlePointerUpResize = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!resizeState.current) return;
+    resizeState.current = null;
+    setResizing(false);
     if (e.currentTarget.hasPointerCapture(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId);
     }
@@ -161,7 +211,25 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
       </div>
 
       {/* Window Body */}
-      <div className="flex-1 min-h-0 flex flex-col bg-[#FFFDF7] overflow-hidden">{children}</div>
+      <div className="flex-1 min-h-0 flex flex-col bg-[#FFFDF7] overflow-hidden relative">
+        {children}
+        {/* 右下角 resize 手柄（最大化时隐藏） */}
+        {!win.maximized && (
+          <div
+            onPointerDown={handlePointerDownResize}
+            onPointerMove={handlePointerMoveResize}
+            onPointerUp={handlePointerUpResize}
+            aria-label="调整窗口大小"
+            className={`absolute right-0 bottom-0 w-5 h-5 cursor-se-resize ${
+              resizing ? 'bg-[#F3E8D2]' : 'bg-[#3A2D28]/5 hover:bg-[#F3E8D2]'
+            } rounded-tl-lg z-10`}
+          >
+            <svg viewBox="0 0 20 20" className="w-full h-full text-[#3A2D28] opacity-70" fill="currentColor">
+              <path d="M14 14h4v4h-4zM9 14h3v3h-3zM14 9h4v3h-4z" />
+            </svg>
+          </div>
+        )}
+      </div>
     </section>
   );
 };

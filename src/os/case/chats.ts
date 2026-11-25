@@ -430,6 +430,47 @@ export const ALL_CHATS: ChatThread[] = [
     fallbackReply: '（波比没有回复。）',
   },
   {
+    id: 'chat_poppy_black',
+    contactName: '黑猫布莱克',
+    role: '黑猫咖啡馆老板',
+    avatarBg: '#1F2937',
+    avatarEmoji: '🐈‍⬛',
+    unread: 0,
+    chapter: 1,
+    account: 'poppy',
+    messages: [
+      {
+        id: 'pbb1',
+        sender: 'them',
+        text: '配方的事，求你了，我已经拿出我的全部家当了',
+        time: '昨天 20:14',
+        chapter: 1,
+      },
+      {
+        id: 'pbb2',
+        sender: 'me',
+        text: '不是钱能衡量的，不卖。',
+        time: '昨天 20:16',
+        chapter: 1,
+      },
+      {
+        id: 'pbb3',
+        sender: 'them',
+        text: '下午两点我们见一面，好好聊聊吧。',
+        time: '今天 09:40',
+        chapter: 1,
+      },
+      {
+        id: 'pbb4',
+        sender: 'me',
+        text: '你来可以，配方别想。',
+        time: '今天 09:42',
+        chapter: 1,
+      },
+    ],
+    fallbackReply: '（布莱克没有回复。）',
+  },
+  {
     id: 'chat_black_supplier',
     contactName: '老熊食材',
     role: '供应商',
@@ -557,7 +598,7 @@ export const ALL_CHATS: ChatThread[] = [
       {
         id: 'pa3',
         sender: 'me',
-        text: '加多少都行，别写进系统。',
+        text: '加多少都行。\n\n哦对了，这单别录系统。',
         time: '12:09',
         chapter: 2,
       },
@@ -597,3 +638,13 @@ export const ALL_CHATS: ChatThread[] = [
     ],
   },
 ];
+
+/**
+ * 把 INITIAL_CHATS 里新增的 thread 合并到云存档恢复的 chats 里。
+ * 已存在的 thread（用户可能发过消息）保留云端版本，新 thread（新增的 seed 内容）补进来。
+ */
+export function mergeSeedChats(loaded: ChatThread[]): ChatThread[] {
+  const loadedIds = new Set(loaded.map((t) => t.id));
+  const newThreads = ALL_CHATS.filter((t) => !loadedIds.has(t.id));
+  return [...loaded, ...newThreads];
+}

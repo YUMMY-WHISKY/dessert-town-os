@@ -5,7 +5,7 @@ import { CH2_CLUES, CH2_EMAILS, CH2_NODES } from './ch2';
 import { CH3_CLUES, CH3_EMAILS, CH3_NODES } from './ch3';
 import { CH4_CLUES, CH4_EMAILS, CH4_NODES } from './ch4';
 import { CH5_EMAILS, CH5_NODES } from './ch5';
-import { ALL_CHATS } from './chats';
+import { ALL_CHATS, mergeSeedChats } from './chats';
 
 export { ROOT_IDS } from './roots';
 export {
@@ -100,6 +100,7 @@ export const INITIAL_EMAILS: EmailItem[] = [
 ];
 
 export const INITIAL_CHATS = ALL_CHATS;
+export { mergeSeedChats };
 
 export const INITIAL_CLUES: ClueItem[] = [
   ...CH1_CLUES,

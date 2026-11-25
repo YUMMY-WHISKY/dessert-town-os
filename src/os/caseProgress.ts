@@ -33,16 +33,24 @@ export function visibleNodes(nodes: FSNode[], chapter: number): FSNode[] {
 }
 
 export function visibleEmails(emails: EmailItem[], chapter: number): EmailItem[] {
-  return emails.filter((m) => nodeChapter(m) <= chapter);
+  return emails.filter(
+    (m) => (m.account ?? 'detective') !== 'detective' || nodeChapter(m) <= chapter
+  );
 }
 
 export function visibleChats(chats: ChatThread[], chapter: number): ChatThread[] {
   return chats
-    .filter((t) => nodeChapter(t) <= chapter)
-    .map((t) => ({
-      ...t,
-      messages: t.messages.filter((m) => (m.chapter ?? 1) <= chapter),
-    }));
+    .filter(
+      (t) => (t.account ?? 'detective') !== 'detective' || nodeChapter(t) <= chapter
+    )
+    .map((t) => {
+      // 非 detective 账户的消息也全放出来（玩家偷看）
+      if ((t.account ?? 'detective') !== 'detective') return t;
+      return {
+        ...t,
+        messages: t.messages.filter((m) => (m.chapter ?? 1) <= chapter),
+      };
+    });
 }
 
 export function getClue(clueId: string): ClueItem | undefined {

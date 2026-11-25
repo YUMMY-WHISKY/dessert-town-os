@@ -6,6 +6,8 @@ export const SAVE_SLOT_COUNT = 3;
 const CURRENT_VERSION = 1;
 const LOCAL_SESSION_KEY = 'frosted-ashes:session:v1';
 
+export type LoginAccount = 'poppy' | 'black';
+
 interface FullCloudPayload {
   version: number;
   saves: (SaveData | null)[];
@@ -14,6 +16,8 @@ interface FullCloudPayload {
   session?: SessionSnapshot | null;
   /** 一次性标记（如尤宁邮件 toast 是否弹过） */
   flags?: Record<string, boolean>;
+  /** 玩家已登录过的账户列表（用于聊天/邮箱快捷切换） */
+  accounts?: LoginAccount[];
 }
 
 export interface SaveData {
@@ -61,6 +65,7 @@ function emptyPayload(): FullCloudPayload {
     achievements: { ...EMPTY_ACHIEVEMENT_PROGRESS },
     session: null,
     flags: {},
+    accounts: [],
   };
 }
 
@@ -127,6 +132,9 @@ function normalizePayload(raw: unknown): FullCloudPayload | null {
   if (!raw || typeof raw !== 'object') return null;
   const r = raw as Partial<FullCloudPayload>;
   if (!Array.isArray(r.saves)) return null;
+  const accounts: LoginAccount[] = Array.isArray(r.accounts)
+    ? (r.accounts.filter((a) => a === 'poppy' || a === 'black') as LoginAccount[])
+    : [];
   return {
     version: typeof r.version === 'number' ? r.version : CURRENT_VERSION,
     saves: Array.from({ length: SAVE_SLOT_COUNT }, (_, i) => normalizeSlot(r.saves?.[i])),
@@ -136,6 +144,7 @@ function normalizePayload(raw: unknown): FullCloudPayload | null {
     },
     session: normalizeSession(r.session),
     flags: r.flags && typeof r.flags === 'object' ? { ...r.flags } : {},
+    accounts,
   };
 }
 
@@ -254,6 +263,23 @@ export async function setFlag(key: string, value: boolean): Promise<void> {
     const p = await loadPayload();
     p.flags = p.flags ?? {};
     p.flags[key] = value;
+    await savePayload(p);
+  });
+}
+
+// ---- accounts（已登录过的账户列表） ----
+
+export async function readLoggedInAccounts(): Promise<LoginAccount[]> {
+  return withSaveLock(async () => {
+    const p = await loadPayload();
+    return p.accounts ?? [];
+  });
+}
+
+export async function writeLoggedInAccounts(accounts: LoginAccount[]): Promise<void> {
+  await withSaveLock(async () => {
+    const p = await loadPayload();
+    p.accounts = accounts;
     await savePayload(p);
   });
 }

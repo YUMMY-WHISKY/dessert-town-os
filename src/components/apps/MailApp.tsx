@@ -256,6 +256,10 @@ export const MailApp: React.FC<MailAppProps> = ({
           setAccount(next);
           setLoginOpen(false);
         }}
+        onSwitchDetective={() => {
+          setAccount('detective');
+          setLoginOpen(false);
+        }}
       />
     </div>
   );
