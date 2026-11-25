@@ -77,6 +77,8 @@ export interface WindowState {
   zIndex: number;
   fileId?: string;
   folderId?: string;
+  /** 已关闭但保留挂载，重新打开时沿用内部状态 */
+  closed?: boolean;
 }
 
 export interface EmailAttachment {

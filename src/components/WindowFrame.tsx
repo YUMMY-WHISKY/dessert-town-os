@@ -31,6 +31,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     origY: number;
   } | null>(null);
   const [dragging, setDragging] = useState(false);
+  // 最小化 / 关闭都只隐藏不卸载，重新打开时应用内部状态还在
+  const hidden = win.minimized || !!win.closed;
 
   const handlePointerDownTitle = (e: React.PointerEvent<HTMLDivElement>) => {
     if (win.maximized) return;
@@ -102,9 +104,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     <section
       role="dialog"
       aria-label={win.title}
-      aria-hidden={win.minimized || undefined}
+      aria-hidden={hidden || undefined}
       onMouseDown={() => onFocus(win.id)}
-      style={win.minimized ? { ...frameStyle, display: 'none' } : frameStyle}
+      style={hidden ? { ...frameStyle, display: 'none' } : frameStyle}
       className={`fixed flex flex-col rounded-2xl bg-[#FFFDF7] border-[2.5px] border-[#3A2D28] overflow-hidden transition-shadow duration-150 ${
         isActive
           ? 'shadow-[6px_6px_0px_#3A2D28]'

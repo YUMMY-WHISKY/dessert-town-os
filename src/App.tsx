@@ -336,7 +336,8 @@ export default function App() {
       elapsedSeconds: elapsedRef.current,
       musicUnlocked,
       musicTrack,
-      windows,
+      // 关闭的窗口只用于保留运行时内部状态，刷新后无法恢复，不写进快照
+      windows: windows.filter((w) => !w.closed),
       activeWindowId,
     }),
     [
@@ -530,7 +531,7 @@ export default function App() {
     topZRef.current += 1;
     const nextZ = topZRef.current;
     setWindows((prev) =>
-      prev.map((w) => (w.id === winId ? { ...w, minimized: false, zIndex: nextZ } : w))
+      prev.map((w) => (w.id === winId ? { ...w, minimized: false, closed: false, zIndex: nextZ } : w))
     );
     setActiveWindowId(winId);
   }, []);
@@ -543,9 +544,11 @@ export default function App() {
       // 文本/图片查看器允许同时打开多个文件；同一个文件再次打开只聚焦
       const isMultiFile =
         (appId === 'notepad' || appId === 'photos') && !!options?.fileId;
-      const existing = isMultiFile
-        ? windows.find((w) => w.appId === appId && w.fileId === options!.fileId)
-        : windows.find((w) => w.appId === appId);
+      const matches = windows.filter(
+        (w) => w.appId === appId && (!isMultiFile || w.fileId === options!.fileId)
+      );
+      // 优先复用已打开的窗口；没有的话复用被关闭但保留挂载的实例，内容才不会重置
+      const existing = matches.find((w) => !w.closed) ?? matches[0];
       if (existing) {
         topZRef.current += 1;
         const nextZ = topZRef.current;
@@ -555,6 +558,7 @@ export default function App() {
               ? {
                   ...w,
                   minimized: false,
+                  closed: false,
                   zIndex: nextZ,
                   ...(isMultiFile
                     ? {}
@@ -610,7 +614,10 @@ export default function App() {
 
   const handleCloseWindow = useCallback((winId: string) => {
     soundEngine.playCloseWindow();
-    setWindows((prev) => prev.filter((w) => w.id !== winId));
+    // 关闭只隐藏不卸载，重新打开同一应用时沿用之前的界面状态
+    setWindows((prev) =>
+      prev.map((w) => (w.id === winId ? { ...w, closed: true, minimized: false } : w))
+    );
     setActiveWindowId((prev) => (prev === winId ? null : prev));
   }, []);
 

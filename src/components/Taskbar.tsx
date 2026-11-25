@@ -97,7 +97,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
 
       {/* Center: Open Windows Switcher */}
       <div className="flex-1 min-w-0 flex items-center gap-2 overflow-x-auto cartoon-scroll py-1">
-        {windows.map((win) => {
+        {windows.filter((win) => !win.closed).map((win) => {
           const isCurrent = win.id === activeWindowId && !win.minimized;
           return (
             <button
