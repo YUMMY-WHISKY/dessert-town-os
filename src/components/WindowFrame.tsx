@@ -32,8 +32,6 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   } | null>(null);
   const [dragging, setDragging] = useState(false);
 
-  if (win.minimized) return null;
-
   const handlePointerDownTitle = (e: React.PointerEvent<HTMLDivElement>) => {
     if (win.maximized) return;
     if ((e.target as HTMLElement).closest('button')) return;
@@ -104,8 +102,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     <section
       role="dialog"
       aria-label={win.title}
+      aria-hidden={win.minimized || undefined}
       onMouseDown={() => onFocus(win.id)}
-      style={frameStyle}
+      style={win.minimized ? { ...frameStyle, display: 'none' } : frameStyle}
       className={`fixed flex flex-col rounded-2xl bg-[#FFFDF7] border-[2.5px] border-[#3A2D28] overflow-hidden transition-shadow duration-150 ${
         isActive
           ? 'shadow-[6px_6px_0px_#3A2D28]'

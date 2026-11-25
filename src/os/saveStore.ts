@@ -37,3 +37,18 @@ export async function writeCloudBlob(blob: CloudPayload): Promise<void> {
   const text = JSON.stringify(blob);
   await sdk.writeSave(encodeText(text));
 }
+
+/**
+ * 串行化「读 blob → 局部修改 → 写回」这类事务。
+ * 成就、手动存档、自动快照共用同一个云存档槽，并发读改写会互相覆盖。
+ */
+let saveChain: Promise<unknown> = Promise.resolve();
+
+export function withSaveLock<T>(job: () => Promise<T>): Promise<T> {
+  const run = saveChain.then(job, job);
+  saveChain = run.then(
+    () => undefined,
+    () => undefined
+  );
+  return run;
+}

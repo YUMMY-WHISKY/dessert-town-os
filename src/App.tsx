@@ -47,8 +47,15 @@ import {
   writeSaveSlot,
   readAchievementProgress,
   writeAchievementProgress,
+  readSessionSnapshot,
+  writeSessionSnapshot,
+  clearSessionSnapshot,
+  readLocalSessionSnapshot,
+  writeLocalSessionSnapshot,
+  clearLocalSessionSnapshot,
   SaveData,
   SaveSlots,
+  SessionSnapshot,
   SAVE_SLOT_COUNT,
 } from './os/saveGame';
 import {
@@ -145,6 +152,43 @@ function createInitialWindows(): WindowState[] {
   return [];
 }
 
+/**
+ * 图片素材在构建时被内联成 base64，单个文件几百 KB。
+ * 存档里只保留节点结构，读档时再按节点 id 从初始数据补回图片，避免存档过大。
+ */
+function stripImageUrls(nodes: FSNode[]): FSNode[] {
+  return nodes.map((node) => {
+    if (!node.imageUrl) return node;
+    const { imageUrl: _imageUrl, ...rest } = node;
+    return rest;
+  });
+}
+
+function hydrateImageUrls(nodes: FSNode[]): FSNode[] {
+  const initialById = new Map(INITIAL_FS_NODES.map((node) => [node.id, node]));
+  return nodes.map((node) => {
+    if (node.imageUrl) return node;
+    const seeded = initialById.get(node.id);
+    return seeded?.imageUrl ? { ...node, imageUrl: seeded.imageUrl } : node;
+  });
+}
+
+function sessionTime(snapshot: SessionSnapshot | null): number {
+  if (!snapshot) return -1;
+  const time = Date.parse(snapshot.savedAt);
+  return Number.isNaN(time) ? -1 : time;
+}
+
+/** 云快照和本地兜底取较新的那份 */
+function pickNewerSession(
+  cloud: SessionSnapshot | null,
+  local: SessionSnapshot | null
+): SessionSnapshot | null {
+  if (!cloud) return local;
+  if (!local) return cloud;
+  return sessionTime(local) > sessionTime(cloud) ? local : cloud;
+}
+
 export default function App() {
   // 从开机动画开始，输入开机口令后进入桌面
   const [phase, setPhase] = useState<GamePhase>('title');
@@ -187,24 +231,57 @@ export default function App() {
 
   const topZRef = useRef(12);
   const toastTimerRef = useRef<number | null>(null);
+  /** 云存档读取完成前不要写回，否则会用初始状态覆盖已有存档 */
+  const hydratedRef = useRef(false);
+  /** 计时器每秒刷新，但不希望它触发快照写入，所以用 ref 记录最新值 */
+  const elapsedRef = useRef(0);
+  /** 云存档读取较慢时，玩家可能已经进入桌面，此时不要再拿旧快照覆盖当前状态 */
+  const phaseRef = useRef<GamePhase>('title');
 
-  // 启动时异步加载云存档（完成 legacy localStorage 迁移）
+  // 启动时加载云存档：手动存档槽、成就、自动会话快照
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [slots, ach] = await Promise.all([
+      const [slots, ach, cloudSession] = await Promise.all([
         readSaveSlots(),
         readAchievementProgress(),
+        readSessionSnapshot(),
       ]);
-      if (!cancelled) {
-        setSaveSlots(slots);
-        setAchievements(ach);
+      if (cancelled) return;
+      const session = pickNewerSession(cloudSession, readLocalSessionSnapshot());
+      setSaveSlots(slots);
+      setAchievements(ach);
+      if (session && phaseRef.current === 'title') {
+        setFsNodes(hydrateImageUrls(session.fsNodes));
+        setEmails(session.emails);
+        setChats(session.chats);
+        setCaseState(session.caseState);
+        setTimelinePlacements(session.timelinePlacements);
+        setDiscoveredClues(session.discoveredClues);
+        setChapterFails(session.chapterFails);
+        setElapsedSeconds(session.elapsedSeconds);
+        elapsedRef.current = session.elapsedSeconds;
+        setMusicUnlocked(session.musicUnlocked);
+        setMusicTrack(session.musicTrack);
+        setWindows(session.windows);
+        setActiveWindowId(session.activeWindowId);
+        topZRef.current = session.windows.reduce(
+          (max, w) => Math.max(max, w.zIndex),
+          12
+        );
       }
+      hydratedRef.current = true;
     })();
     return () => { cancelled = true; };
   }, []);
 
+  // 计时器：每秒 +1，同时同步给快照用的 ref
   useEffect(() => {
+    elapsedRef.current = elapsedSeconds;
+  }, [elapsedSeconds]);
+
+  useEffect(() => {
+    phaseRef.current = phase;
     document.body.dataset.state = phase;
   }, [phase]);
 
@@ -237,9 +314,73 @@ export default function App() {
   }, [phase, showToast]);
 
   // 成就进度持久化（跨「从头再查一次」保留）
+  // 必须等云存档读取完成后再写，否则首次挂载会用空进度覆盖线上成就
   useEffect(() => {
+    if (!hydratedRef.current) return;
     writeAchievementProgress(achievements).catch(() => {});
   }, [achievements]);
+
+  /** 构造当前会话快照（不含成就，成就单独持久化） */
+  const buildSessionSnapshot = useCallback(
+    (): SessionSnapshot => ({
+      version: 1,
+      savedAt: new Date().toISOString(),
+      chapter: caseState.chapter,
+      discoveredClues,
+      caseState,
+      timelinePlacements,
+      fsNodes: stripImageUrls(fsNodes),
+      emails,
+      chats,
+      chapterFails,
+      elapsedSeconds: elapsedRef.current,
+      musicUnlocked,
+      musicTrack,
+      windows,
+      activeWindowId,
+    }),
+    [
+      caseState,
+      discoveredClues,
+      timelinePlacements,
+      fsNodes,
+      emails,
+      chats,
+      chapterFails,
+      musicUnlocked,
+      musicTrack,
+      windows,
+      activeWindowId,
+    ]
+  );
+
+  const flushSessionSnapshot = useCallback(() => {
+    if (!hydratedRef.current) return;
+    const snapshot = buildSessionSnapshot();
+    // 同步兜底先落地，云写入失败或被页面卸载打断也能保住现场
+    writeLocalSessionSnapshot(snapshot);
+    writeSessionSnapshot(snapshot).catch(() => {});
+  }, [buildSessionSnapshot]);
+
+  // 状态变化后延迟写入快照，避免连续操作时频繁读写云存档
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    const timer = window.setTimeout(flushSessionSnapshot, 1500);
+    return () => window.clearTimeout(timer);
+  }, [flushSessionSnapshot]);
+
+  // 切后台 / 刷新 / 关闭页面前立刻落一份快照
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flushSessionSnapshot();
+    };
+    window.addEventListener('pagehide', flushSessionSnapshot);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('pagehide', flushSessionSnapshot);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [flushSessionSnapshot]);
 
   // 状态变化时检查是否有新成就
   useEffect(() => {
@@ -592,8 +733,12 @@ export default function App() {
 
   const handleResetCase = useCallback(() => {
     soundEngine.stopMusic();
+    // 重新开案：丢掉旧快照，避免刷新后又被恢复回来
+    clearLocalSessionSnapshot();
+    clearSessionSnapshot().catch(() => {});
     setMusicPlaying(false);
     setMusicUnlocked(false);
+    elapsedRef.current = 0;
     setFsNodes(INITIAL_FS_NODES);
     setEmails(INITIAL_EMAILS);
     setChats(INITIAL_CHATS);
@@ -619,7 +764,7 @@ export default function App() {
         discoveredClues,
         caseState,
         timelinePlacements,
-        fsNodes,
+        fsNodes: stripImageUrls(fsNodes),
         emails,
         chats,
         achievements,
@@ -660,7 +805,7 @@ export default function App() {
       }
       soundEngine.stopMusic();
       setMusicPlaying(false);
-      setFsNodes(data.fsNodes);
+      setFsNodes(hydrateImageUrls(data.fsNodes));
       setEmails(data.emails);
       setChats(data.chats);
       setCaseState(data.caseState);
