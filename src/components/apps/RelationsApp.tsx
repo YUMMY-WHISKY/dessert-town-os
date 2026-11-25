@@ -27,7 +27,8 @@ interface Edge {
   a: string;
   b: string;
   type: RelationType;
-  ok: boolean;
+  /** null = 未判定, true = 对, false = 错 */
+  ok: boolean | null;
 }
 
 export const RelationsApp: React.FC<RelationsAppProps> = ({
@@ -44,6 +45,8 @@ export const RelationsApp: React.FC<RelationsAppProps> = ({
   const [selected, setSelected] = useState<string | null>(null);
   const [pending, setPending] = useState<[string, string] | null>(null);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitMsg, setSubmitMsg] = useState<string>('');
 
   const boardRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ id: string; startX: number; startY: number; ox: number; oy: number } | null>(
@@ -51,8 +54,8 @@ export const RelationsApp: React.FC<RelationsAppProps> = ({
   );
 
   const collectedNodes = nodes.filter((n) => collectedIds.includes(n.id));
-  const solved = edges.filter((e) => e.ok);
-  const allSolved = solved.length === edgeDefs.length;
+  const solved = edges.filter((e) => e.ok === true);
+  const allSolved = submitted && solved.length === edgeDefs.length;
 
   const handleCardPointerDown = (e: React.PointerEvent, node: RelationNode) => {
     if ((e.target as HTMLElement).closest('[data-pin]')) return;
@@ -104,32 +107,58 @@ export const RelationsApp: React.FC<RelationsAppProps> = ({
   const applyType = (type: RelationType) => {
     if (!pending) return;
     const [a, b] = pending;
-    const def = edgeDefs.find(
-      (d) => (d.a === a && d.b === b) || (d.a === b && d.b === a)
-    );
-    const ok = !!def && def.type === type;
     const exists = edges.some((e) => (e.a === a && e.b === b) || (e.a === b && e.b === a));
 
-    if (ok && def) {
+    // 连线时不判定，ok=null 留待统一提交
+    const next = exists
+      ? edges.map((e) =>
+          (e.a === a && e.b === b) || (e.a === b && e.b === a)
+            ? { ...e, type, ok: null }
+            : e
+        )
+      : [...edges, { a, b, type, ok: null }];
+    setEdges(next);
+    setSubmitted(false);
+    setSubmitMsg('');
+    setPending(null);
+  };
+
+  const handleSubmit = () => {
+    // 全量判定：玩家连的每条线和 edgeDefs 比对
+    const judged: Edge[] = edges.map((e) => {
+      const def = edgeDefs.find(
+        (d) =>
+          ((d.a === e.a && d.b === e.b) || (d.a === e.b && d.b === e.a)) &&
+          d.type === e.type
+      );
+      return { ...e, ok: !!def };
+    });
+
+    // 玩家连了但不在 edgeDefs 里的 pair（pair 存在但 type 不对 / pair 根本不是正确 pair）
+    const allOkPairs = edgeDefs.map((d) =>
+      edges.find(
+        (e) => (e.a === d.a && e.b === d.b) || (e.a === d.b && e.b === d.a)
+      )
+    );
+    const fullyCorrect = judged.filter((e) => e.ok).length === edgeDefs.length;
+
+    setEdges(judged);
+    setSubmitted(true);
+
+    if (fullyCorrect) {
       soundEngine.playClueFound();
-      const next = exists ? edges : [...edges, { a, b, type, ok: true }];
-      setEdges(next);
-      if (def.clueId) onDiscoverClue(def.clueId);
-      if (next.filter((e) => e.ok).length === edgeDefs.length) {
-        onFlag('relations_solved');
-        onDiscoverClue('clue_relations_solved');
-      }
+      setSubmitMsg('全部连对了。这张网的中心不是布莱克。');
+      // 解锁每条边的线索
+      edgeDefs.forEach((d) => {
+        if (d.clueId) onDiscoverClue(d.clueId);
+      });
+      onFlag('relations_solved');
+      onDiscoverClue('clue_relations_solved');
     } else {
       soundEngine.playError();
-      setEdges((prev) => [
-        ...prev.filter((e) => !(e.a === a && e.b === b)),
-        { a, b, type, ok: false },
-      ]);
-      window.setTimeout(() => {
-        setEdges((prev) => prev.filter((e) => e.ok || !(e.a === a && e.b === b)));
-      }, 1200);
+      const correctCount = judged.filter((e) => e.ok).length;
+      setSubmitMsg(`连对了 ${correctCount} 条。再想想剩下的。`);
     }
-    setPending(null);
   };
 
   return (
@@ -169,14 +198,16 @@ export const RelationsApp: React.FC<RelationsAppProps> = ({
               if (!pa || !pb) return null;
               const mx = (pa.x + pb.x) / 2;
               const my = (pa.y + pb.y) / 2 - 6;
+              const stroke =
+                e.ok === true ? '#F59E0B' : e.ok === false ? '#DC2626' : '#9CA3AF';
               return (
                 <path
                   key={i}
                   d={`M ${pa.x} ${pa.y} Q ${mx} ${my} ${pb.x} ${pb.y}`}
                   fill="none"
-                  stroke={e.ok ? '#F59E0B' : '#9CA3AF'}
+                  stroke={stroke}
                   strokeWidth={0.9}
-                  strokeDasharray={e.ok ? undefined : '2 2'}
+                  strokeDasharray={e.ok === null ? '2 2' : undefined}
                   vectorEffect="non-scaling-stroke"
                 />
               );
@@ -245,40 +276,93 @@ export const RelationsApp: React.FC<RelationsAppProps> = ({
         <aside className="w-56 shrink-0 p-3 border-l-2 border-[#E5D8C5] overflow-y-auto cartoon-scroll">
           <h3 className="text-xs font-black text-[#3A2D28] mb-1 flex items-center gap-1.5">
             <Link2 className="w-4 h-4 text-[#D97706]" />
-            <span>已确认的关系</span>
+            <span>人物关系板</span>
           </h3>
           <p className="text-[10px] text-[#6E5A52] mb-2 leading-relaxed">
             每张卡片都别着一枚红色图钉。先点一枚，再点另一枚，然后告诉板子这两个人之间是什么关系。
-            <span className="text-[#8B7A6B]">卡片可以拖动，用来把线理顺。</span>
+            <span className="text-[#8B7A6B]">全部连好之后点「提交判定」统一检查。</span>
           </p>
           <p className="text-[11px] font-bold text-[#6E5A52] mb-2 tabular-nums">
-            {solved.length} / {edgeDefs.length}
+            已连线 {edges.length} / 需连 {edgeDefs.length}
+            {submitted ? ` · 连对 ${solved.length}` : ''}
           </p>
 
+          {submitMsg ? (
+            <p
+              className={`text-[11px] font-black mb-2 px-2 py-1.5 rounded-lg border-2 leading-snug ${
+                allSolved
+                  ? 'bg-[#FEF08A] border-[#3A2D28] text-[#3A2D28]'
+                  : 'bg-[#FEE2E2] border-[#3A2D28] text-[#991B1B]'
+              }`}
+            >
+              {submitMsg}
+            </p>
+          ) : null}
+
+          {!allSolved ? (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={edges.length < edgeDefs.length}
+              className={`cartoon-btn w-full py-2 rounded-xl text-xs font-black mb-3 ${
+                edges.length < edgeDefs.length
+                  ? 'bg-[#E5D8C5] text-[#8B7A6B] cursor-not-allowed'
+                  : 'bg-[#FEF08A] text-[#3A2D28]'
+              }`}
+            >
+              提交判定 {edges.length < edgeDefs.length ? `（还差 ${edgeDefs.length - edges.length} 条）` : ''}
+            </button>
+          ) : null}
+
           <div className="space-y-2">
-            {edges
-              .filter((e) => e.ok)
-              .map((e) => {
-                const def = edgeDefs.find(
-                  (d) =>
-                    ((d.a === e.a && d.b === e.b) || (d.a === e.b && d.b === e.a)) &&
-                    d.type === e.type
-                );
-                if (!def) return null;
-                return (
-                  <div
-                    key={`${e.a}-${e.b}`}
-                    className="p-2 rounded-lg bg-[#FEF3C7] border-2 border-[#3A2D28]"
-                  >
-                    <p className="text-[10px] font-black text-[#D97706] mb-0.5">{e.type}</p>
-                    <p className="text-[11px] text-[#3A2D28] leading-snug">
-                      {discoveredClues.includes(def.clueId ?? '')
-                        ? def.testimony
-                        : '证词已收录'}
-                    </p>
-                  </div>
-                );
-              })}
+            {edges.map((e) => {
+              const def = edgeDefs.find(
+                (d) =>
+                  ((d.a === e.a && d.b === e.b) || (d.a === e.b && d.b === e.a)) &&
+                  d.type === e.type
+              );
+              const nodeA = nodes.find((n) => n.id === e.a)?.name ?? e.a;
+              const nodeB = nodes.find((n) => n.id === e.b)?.name ?? e.b;
+              let bg = '#FEF3C7';
+              let border = '#3A2D28';
+              let tag = '✓';
+              if (e.ok === null) {
+                bg = '#F6EFE2';
+                tag = '...';
+              } else if (e.ok === false) {
+                bg = '#FEE2E2';
+                border = '#991B1B';
+                tag = '✗';
+              }
+              return (
+                <div
+                  key={`${e.a}-${e.b}`}
+                  className="p-2 rounded-lg border-2"
+                  style={{ backgroundColor: bg, borderColor: border }}
+                >
+                  <p className="text-[10px] font-black mb-0.5">
+                    <span
+                      className={
+                        e.ok === true
+                          ? 'text-[#D97706]'
+                          : e.ok === false
+                          ? 'text-[#991B1B]'
+                          : 'text-[#6E5A52]'
+                      }
+                    >
+                      {e.type}
+                    </span>
+                    <span className="ml-1 tabular-nums">{tag}</span>
+                  </p>
+                  <p className="text-[10px] text-[#6E5A52] leading-tight">
+                    {nodeA} ↔ {nodeB}
+                  </p>
+                  {def && discoveredClues.includes(def.clueId ?? '') && e.ok === true ? (
+                    <p className="text-[10px] text-[#3A2D28] leading-snug mt-1">{def.testimony}</p>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </aside>
       </div>
