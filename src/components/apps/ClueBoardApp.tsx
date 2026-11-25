@@ -77,8 +77,12 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
   const isFinale = viewChapter === 5;
   const tabs: { id: 'clues' | 'chain' | 'conclusion'; label: string }[] = [
     { id: 'clues', label: '线索与拼合' },
-    ...(viewChapter === 4 ? [{ id: 'chain' as const, label: '手续链' }] : []),
-    ...(viewChapter === 3 ? [{ id: 'chain' as const, label: '旧物归档' }] : []),
+    ...(viewChapter === 4 && viewChapter <= caseState.chapter
+      ? [{ id: 'chain' as const, label: '手续链' }]
+      : []),
+    ...(viewChapter === 3 && viewChapter <= caseState.chapter
+      ? [{ id: 'chain' as const, label: '旧物归档' }]
+      : []),
     {
       id: 'conclusion',
       label: isFinale && !isReview ? '终局指控' : isReview ? '当时的结论' : '章节结论',
@@ -349,7 +353,12 @@ export const ClueBoardApp: React.FC<ClueBoardAppProps> = ({
           </div>
         </div>
       ) : tab === 'chain' ? (
-        viewChapter === 3 ? (
+        viewChapter > caseState.chapter ? (
+          <div className="p-6 text-center text-[#8B7A6B] text-xs font-bold leading-relaxed bg-[#FFFDF7] border-2 border-dashed border-[#D8CBB8] rounded-2xl">
+            还没到这一步。<br />
+            先把当前章节走完吧。
+          </div>
+        ) : viewChapter === 3 ? (
           <FilingPuzzle
             discoveredClues={discoveredClues}
             onDiscoverClue={onDiscoverClue}
@@ -436,6 +445,11 @@ const ConclusionPanel: React.FC<ConclusionPanelProps> = ({
             chapter={viewDef}
             answers={caseState.chapterAnswers[viewChapter] ?? {}}
           />
+        ) : viewChapter > caseState.chapter ? (
+          <div className="p-6 text-center text-[#8B7A6B] text-xs font-bold leading-relaxed bg-[#FFFDF7] border-2 border-dashed border-[#D8CBB8] rounded-2xl">
+            还没到这一章的结论。<br />
+            先把当前章节走完吧。
+          </div>
         ) : viewDef.conclusion ? (
           <>
             <ChapterForm
