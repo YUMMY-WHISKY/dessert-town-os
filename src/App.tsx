@@ -304,11 +304,13 @@ export default function App() {
     }, 3600);
   }, []);
 
-  // 进入桌面时只提示「收到新邮件」，不自动打开信箱
+  // 进入桌面时只提示「收到新邮件」，不自动打开信箱（只弹一次）
   useEffect(() => {
     if (phase !== 'playing') return;
+    if (localStorage.getItem('yl_toast_shown') === '1') return;
     const timer = window.setTimeout(() => {
       showToast('喵喵信箱收到新邮件：尤宁《案件交接令》');
+      localStorage.setItem('yl_toast_shown', '1');
     }, 1500);
     return () => window.clearTimeout(timer);
   }, [phase, showToast]);
@@ -759,6 +761,7 @@ export default function App() {
     setVictoryInfo(null);
     setToastMessage(null);
     setPhase('playing');
+    localStorage.removeItem('yl_toast_shown');
     showToast('案件已重置。喵喵信箱收到新邮件：尤宁《案件交接令》');
   }, [showToast]);
 
