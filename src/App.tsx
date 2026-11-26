@@ -1295,7 +1295,6 @@ export default function App() {
               onReadThread={handleReadThread}
               onDiscoverClue={discoverClue}
               onFlag={handleFlag}
-              onSendReply={handleSendReply}
             />
           ) : null}
 

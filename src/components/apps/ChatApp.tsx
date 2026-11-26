@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Send, UserRound } from 'lucide-react';
+import { UserRound } from 'lucide-react';
 import { ChatChoice, ChatThread } from '../../os/types';
 import { RichText } from '../RichText';
 import { soundEngine } from '../../os/sound';
@@ -9,7 +9,6 @@ interface ChatAppProps {
   threads: ChatThread[];
   chapter: number;
   onReadThread: (thread: ChatThread) => void;
-  onSendReply: (threadId: string, text: string) => void;
   onDiscoverClue: (clueId: string) => void;
   onFlag: (flag: string) => void;
 }
@@ -23,6 +22,10 @@ interface DialogueLogItem {
 interface DialogueState {
   nodeId: string | null;
   log: DialogueLogItem[];
+  /** 已经展示过 prompt 的节点集合，避免重复追加固定搭配 */
+  visitedNodes: Set<string>;
+  /** 已用过的选项 key：${nodeId}:${choiceIndex} */
+  usedChoices: Set<string>;
 }
 
 interface TypingState {
@@ -55,12 +58,10 @@ export const ChatApp: React.FC<ChatAppProps> = ({
   threads,
   chapter,
   onReadThread,
-  onSendReply,
   onDiscoverClue,
   onFlag,
 }) => {
   const [selectedId, setSelectedId] = useState(threads[0]?.id ?? '');
-  const [replyText, setReplyText] = useState('');
   const [dialogues, setDialogues] = useState<Record<string, DialogueState>>({});
   const [typing, setTyping] = useState<TypingState | null>(null);
   const [account, setAccount] = useState<'detective' | 'poppy' | 'black'>('detective');
@@ -103,7 +104,15 @@ export const ChatApp: React.FC<ChatAppProps> = ({
       : null;
 
   const availableChoices = currentNode
-    ? currentNode.choices.filter((c) => !c.chapter || c.chapter <= chapter)
+    ? currentNode.choices
+        .map((choice, origIdx) => ({ choice, origIdx }))
+        .filter(({ choice, origIdx }) => {
+          if (choice.chapter && choice.chapter > chapter) return false;
+          const key = `${currentNode.id}:${origIdx}`;
+          // casual（日常闲聊）选一次就隐藏；case（案件相关）永远显示，让玩家把所有分支跑完
+          if (state?.usedChoices.has(key) && choice.kind === 'casual') return false;
+          return true;
+        })
     : [];
 
   useEffect(() => {
@@ -114,7 +123,15 @@ export const ChatApp: React.FC<ChatAppProps> = ({
       const start = thread.dialogue!.nodes.find((n) => n.id === thread.dialogue!.start);
       if (!start) return prev;
       // 由玩家先开口：不预置对方的开场白，直接把提问选项交给玩家
-      return { ...prev, [thread.id]: { nodeId: start.id, log: [] } };
+      return {
+        ...prev,
+        [thread.id]: {
+          nodeId: start.id,
+          log: [],
+          visitedNodes: new Set([start.id]),
+          usedChoices: new Set(),
+        },
+      };
     });
   }, [isDetective, activeThread?.id, activeThread?.dialogue]);
 
@@ -123,26 +140,21 @@ export const ChatApp: React.FC<ChatAppProps> = ({
     onReadThread(thread);
   };
 
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeThread || !replyText.trim()) return;
-    soundEngine.playSend();
-    onSendReply(activeThread.id, replyText.trim());
-    setReplyText('');
-  };
-
-  const handleChoice = (choice: ChatChoice) => {
+  const handleChoice = (choice: ChatChoice, choiceIdx: number) => {
     if (!activeThread || !dialogue || !state) return;
     const nextNode = choice.next ? dialogue.nodes.find((n) => n.id === choice.next) : null;
 
     setDialogues((prev) => {
       const cur = prev[activeThread.id];
       if (!cur) return prev;
+      const key = `${cur.nodeId}:${choiceIdx}`;
       return {
         ...prev,
         [activeThread.id]: {
+          ...cur,
           nodeId: null,
           log: [...cur.log, { role: 'me', text: choice.label }],
+          usedChoices: new Set(cur.usedChoices).add(key),
         },
       };
     });
@@ -190,14 +202,18 @@ export const ChatApp: React.FC<ChatAppProps> = ({
       setDialogues((prev) => {
         const cur = prev[typing.threadId];
         if (!cur) return prev;
+        const firstVisit = typing.nextNodeId && !cur.visitedNodes.has(typing.nextNodeId);
+        const newVisited = new Set(cur.visitedNodes);
+        if (typing.nextNodeId) newVisited.add(typing.nextNodeId);
         return {
           ...prev,
           [typing.threadId]: {
             ...cur,
             nodeId: typing.nextNodeId,
-            log: nextNode?.prompt
+            log: firstVisit && nextNode?.prompt
               ? [...cur.log, { role: 'them' as const, text: nextNode.prompt }]
               : cur.log,
+            visitedNodes: newVisited,
           },
         };
       });
@@ -356,22 +372,26 @@ export const ChatApp: React.FC<ChatAppProps> = ({
                 </div>
               ) : null}
 
-              {isDetective && dialogue && state && !isTyping && (!currentNode || availableChoices.length === 0) ? (
+              {isDetective && dialogue && state && !isTyping && currentNode && availableChoices.length === 0 ? (
                 <p className="text-center text-[11px] text-[#A99A8C] pt-1">
-                  这段问话结束了。你可以继续用下面的输入框提问。
+                  这个节点的选项都问完了。
                 </p>
               ) : null}
               <div ref={bottomRef} />
             </div>
 
-            {isTyping ? null : isDetective && currentNode && availableChoices.length > 0 ? (
+            {isTyping ? null : !isDetective ? (
+              <p className="p-3 bg-[#F6EFE2] border-t-2 border-[#3A2D28] text-center text-[11px] font-bold text-[#8B7A6B]">
+                这是之前的聊天记录，无法继续回复。
+              </p>
+            ) : currentNode && availableChoices.length > 0 ? (
               <div className="p-1.5 bg-[#F6EFE2] border-t-2 border-[#3A2D28]">
                 <div className="flex flex-col gap-1">
-                  {availableChoices.map((choice, idx) => (
+                  {availableChoices.map(({ choice, origIdx }) => (
                     <button
-                      key={idx}
+                      key={origIdx}
                       type="button"
-                      onClick={() => handleChoice(choice)}
+                      onClick={() => handleChoice(choice, origIdx)}
                       className="cartoon-btn w-full text-left px-2 py-1 rounded-lg bg-[#FFFDF7] border-2 border-[#3A2D28] text-[11px] font-bold text-[#3A2D28] hover:bg-[#FEF3C7] leading-snug"
                     >
                       {choice.label}
@@ -379,35 +399,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({
                   ))}
                 </div>
               </div>
-            ) : isDetective ? (
-              <form
-                onSubmit={handleSend}
-                className="p-2.5 bg-[#F6EFE2] border-t-2 border-[#3A2D28] flex items-center gap-2"
-              >
-                <label htmlFor="chat-reply-input" className="sr-only">
-                  输入聊天消息
-                </label>
-                <input
-                  id="chat-reply-input"
-                  type="text"
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  placeholder={`给 ${activeThread.contactName} 发一条询问消息...`}
-                  className="flex-1 px-3 py-1.5 text-sm rounded-xl bg-[#FFFDF7] border-2 border-[#3A2D28] text-[#3A2D28] focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="cartoon-btn px-3.5 py-1.5 rounded-xl bg-[#A7F3D0] text-xs font-bold text-[#3A2D28] flex items-center gap-1 whitespace-nowrap"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>发送</span>
-                </button>
-              </form>
-            ) : (
-              <p className="p-3 bg-[#F6EFE2] border-t-2 border-[#3A2D28] text-center text-[11px] font-bold text-[#8B7A6B]">
-                这是之前的聊天记录，无法继续回复。
-              </p>
-            )}
+            ) : null}
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center px-6">

@@ -131,6 +131,8 @@ export interface ChatChoice {
   chapter?: number;
   /** casual=随便聊聊；case=案件相关。默认带 clueId 就是 case */
   kind?: 'casual' | 'case';
+  /** 选过之后是否继续显示。默认 false（隐藏）。casual 闲聊标 true 让玩家反复聊 */
+  repeatable?: boolean;
 }
 
 export interface ChatDialogueNode {

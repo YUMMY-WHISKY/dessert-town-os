@@ -245,25 +245,6 @@ export const DesktopPet: React.FC<DesktopPetProps> = ({
     posRef.current = pos;
   }, [pos]);
 
-  // 自己溜达
-  useEffect(() => {
-    if (dragging) return;
-    const timer = window.setInterval(() => {
-      if (sleeping || bubble) return;
-      const prev = posRef.current;
-      const next = clampPos(
-        prev.x + (Math.random() * 2 - 1) * 260,
-        prev.y + (Math.random() * 2 - 1) * 90
-      );
-      setFacing(next.x >= prev.x ? 1 : -1);
-      setPos(next);
-      setWalking(true);
-      if (walkTimerRef.current !== null) window.clearTimeout(walkTimerRef.current);
-      walkTimerRef.current = window.setTimeout(() => setWalking(false), 2300);
-    }, 7000);
-    return () => window.clearInterval(timer);
-  }, [dragging, sleeping, bubble]);
-
   // 长时间没人理就睡觉
   useEffect(() => {
     const timer = window.setInterval(() => {
